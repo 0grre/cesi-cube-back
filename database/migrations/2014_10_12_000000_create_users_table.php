@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('lastname')->nullable();
             $table->string('address1')->nullable();
             $table->string('address2')->nullable();
-            $table->string('zipCode')->nullable();
+            $table->integer('zipCode')->nullable();
             $table->string('city')->nullable();
             $table->string('primaryPhone')->nullable();
             $table->string('secondaryPhone')->nullable();

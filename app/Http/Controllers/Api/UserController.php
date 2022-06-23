@@ -74,6 +74,7 @@ class UserController extends Controller
         }
 
         $user->disabled_at = date('Y-m-d H:i:s');
+        $user->save();
 
         return $this->sendResponse($user, 'User disabled successfully.');
     }
