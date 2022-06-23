@@ -19,8 +19,7 @@ class TypeController extends Controller
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(
-            TypeCategoryResource::collection(Type::all()), 'Types retrieved successfully.');
+        return response()->json(Type::all())->withCookie('success', 'Types retrieved successfully.');
     }
 
     /**
@@ -28,12 +27,10 @@ class TypeController extends Controller
      *
      * @param Request $request
      * @return JsonResponse
-     * @throws ValidationException
      */
     public function store(Request $request): JsonResponse
     {
-        return $this->sendResponse(new TypeCategoryResource(
-            self::TypeValidator($request)), 'Type created successfully.');
+        return response()->json(self::TypeValidator($request))->withCookie('success', 'Type created successfully.');
     }
 
     /**
@@ -51,8 +48,7 @@ class TypeController extends Controller
             return $this->sendError('Type not found.');
         }
 
-        return $this->sendResponse(
-            TypeCategoryResource::collection($type), 'Type retrieved successfully.');
+        return response()->json(self::TypeValidator($type))->withCookie('success', 'Type found successfully.');
     }
 
     /**
@@ -61,12 +57,10 @@ class TypeController extends Controller
      * @param Request $request
      * @param $id
      * @return JsonResponse
-     * @throws ValidationException
      */
     public function update(Request $request, $id): JsonResponse
     {
-        return $this->sendResponse(new TypeCategoryResource(
-            self::TypeValidator($request, $id)), 'Type updated successfully.');
+        return response()->json(self::TypeValidator($request, $id))->withCookie('success', 'Type updated successfully.');
     }
 
     /**
@@ -82,13 +76,20 @@ class TypeController extends Controller
     }
 
     /**
-     * @return void
-     * @throws ValidationException
+     * @param Request $request
+     * @param null $id
+     * @return Type|JsonResponse
      */
-    public function TypeValidator(Request $request, $id = null){
-        Validator::make($request->all(), [
-            'content' => 'required|string|min:2|max:255',
-        ])->validate();
+    public function TypeValidator(Request $request, $id = null): Type|JsonResponse
+    {
+
+        $validator = Validator::make($request->all(), [
+            'label' => 'required|string|min:2|max:255',
+        ]);
+
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', (array)$validator->errors());
+        }
 
         $type = $id ? Type::find($id) : new Type();
         $type->label = $request->label;

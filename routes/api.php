@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\ResourceController;
 use App\Http\Controllers\Api\TypeController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Models\Type;
 use App\Models\User;
@@ -16,12 +17,14 @@ use Illuminate\Support\Facades\Route;
 */
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [RegisterController::class, 'login']);
+Route::get('/login', function () {
+    return response()->json(['error'=>'Unauthorised']);
+})->name('login');
 
 Route::middleware('auth:sanctum')->group( function () {
 
-    Route::get('/users', function () {
-        return User::all();
-    });
+    Route::get('/users', [UserController::class, 'index']);
+    Route::get('/users/{id}', [UserController::class, 'show']);
 
     Route::get('/types', [TypeController::class, 'index']);
     Route::get('/types/{id}', [TypeController::class, 'show']);

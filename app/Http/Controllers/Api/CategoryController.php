@@ -3,86 +3,94 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\TypeCategoryResource;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
     /**
-     *
      * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(TypeCategoryResource::collection(Category::all()), 'Categories retrieved successfully.');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        //
+        return response()->json(Category::all())->withCookie('success', 'Categories retrieved successfully.');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return Response
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        //
+        return response()->json(self::CategoryValidator($request))->withCookie('success', 'Category created successfully.');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Category  $category
-     * @return Response
+     * @param $id
+     * @return JsonResponse
      */
-    public function show(Category $category)
+    public function show($id): JsonResponse
     {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Category  $category
-     * @return Response
-     */
-    public function edit(Category $category)
-    {
-        //
+        $category = Category::find($id);
+
+        if (is_null($category)) {
+            return $this->sendError('Category not found.');
+        }
+
+        return response()->json(self::CategoryValidator($category))->withCookie('success', 'Category found successfully.');
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Category  $category
-     * @return Response
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, $id): JsonResponse
     {
-        //
+        return response()->json(self::CategoryValidator($request, $id))->withCookie('success', 'Category updated successfully.');
     }
 
     /**
-     * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Category  $category
-     * @return Response
+     * @param $id
+     * @return JsonResponse
      */
-    public function destroy(Category $category)
+    public function destroy($id): JsonResponse
     {
-        //
+        Category::find($id)->delete();
+
+        return $this->sendResponse([], 'Category deleted successfully.');
+    }
+
+    /**
+     * @param Request $request
+     * @param null $id
+     * @return Category|JsonResponse
+     */
+    public function CategoryValidator(Request $request, $id = null): Category|JsonResponse
+    {
+
+        $validator = Validator::make($request->all(), [
+            'label' => 'required|string|min:2|max:255',
+        ]);
+
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', (array)$validator->errors());
+        }
+
+        $category = $id ? Category::find($id) : new Category();
+        $category->label = $request->label;
+        $category->save();
+
+        return $category;
     }
 }
