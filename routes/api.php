@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\ResourceController;
 use App\Http\Controllers\Api\TypeController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Models\Type;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 | API Routes
 |--------------------------------------------------------------------------
 */
+Route::post('register', [RegisterController::class, 'register']);
+Route::post('login', [RegisterController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group( function () {
 
@@ -38,11 +41,11 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::put('/resources/{id}', [ResourceController::class, 'update']);
     Route::delete('/resources/{id}', [ResourceController::class, 'destroy']);
 
-    Route::get('/resources/{id}/comments', [CommentController::class, 'index']);
-    Route::get('/resources/{id}/comments/{id}', [CommentController::class, 'show']);
-    Route::post('/resources/{id}/comments', [CommentController::class, 'store']);
-    Route::put('/resources/{id}/comments/{id}', [CommentController::class, 'update']);
-    Route::delete('/resources/{id}/comments/{id}', [CommentController::class, 'destroy']);
+//    Route::get('/resources/{id}/comments', [CommentController::class, 'index']);
+//    Route::get('/resources/{id}/comments/{id}', [CommentController::class, 'show']);
+//    Route::post('/resources/{id}/comments', [CommentController::class, 'store']);
+//    Route::put('/resources/{id}/comments/{id}', [CommentController::class, 'update']);
+//    Route::delete('/resources/{id}/comments/{id}', [CommentController::class, 'destroy']);
 
     Route::resource('resources', ResourceController::class);
 });

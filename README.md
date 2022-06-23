@@ -22,6 +22,7 @@ lancer le docker compose, quand le conteneur est lancé,
 dans le terminal:
 
 ```
+php artisan key:generate
 php artisan migrate
 php artisan db:seed
 php artisan serve
