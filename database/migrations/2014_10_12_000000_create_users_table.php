@@ -26,8 +26,8 @@ return new class extends Migration
             $table->string('city')->nullable();
             $table->string('primaryPhone')->nullable();
             $table->string('secondaryPhone')->nullable();
-            $table->string('birthDate')->nullable();
-            $table->string('disabledAt')->nullable();
+            $table->date('birthDate')->nullable();
+            $table->dateTime('disabled_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
