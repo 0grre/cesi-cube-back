@@ -18,7 +18,7 @@ class ResourceController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(Resource::all())->withCookie('success', 'Resources found successfully.');;
+        return $this->sendResponse(Resource::all(), 'Resources found successfully.');;
     }
 
     /**
@@ -30,7 +30,7 @@ class ResourceController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        return response()->json(self::ResourceValidator($request))->withCookie('success', 'Resource created successfully.');
+        return $this->sendResponse(self::ResourceValidator($request), 'Resource created successfully.');
     }
 
     /**
@@ -47,7 +47,7 @@ class ResourceController extends Controller
             return $this->sendError('Resource not found.');
         }
 
-        return response()->json($resource)->withCookie('success', 'Resource found successfully.');
+        return $this->sendResponse($resource, 'Resource found successfully.');
     }
 
     /**
@@ -60,7 +60,7 @@ class ResourceController extends Controller
      */
     public function update(Request $request, $id): JsonResponse
     {
-        return response()->json(self::ResourceValidator($request, $id));
+        return $this->sendResponse(self::ResourceValidator($request, $id), 'Resource updated successfully.');
     }
 
     /**
@@ -76,7 +76,7 @@ class ResourceController extends Controller
             return $this->sendError('Resource not found.');
         }
 
-        return response()->json($resource)->withCookie('success', 'Resource deleted successfully.');
+        return $this->sendResponse([], 'Resource deleted successfully.');
     }
 
     /**

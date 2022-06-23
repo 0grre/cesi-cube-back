@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Password;
 
 class RegisterController extends Controller
 {
@@ -22,8 +21,17 @@ class RegisterController extends Controller
     public function register(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required',
+            'email' => 'required|email|unique',
+            'password' => 'required|string|min:4',
+            'firstname' => 'string|min:2|max:55',
+            'lastname' => 'string|min:2|max:55',
+            'address1' => 'string|min:2|max:255',
+            'address2' => 'string|min:2|max:255',
+            'zipCode' => 'regex:\d{5}',
+            'city' => 'string|min:2|max:55',
+            'primaryPhone' => 'string',
+            'secondaryPhone' => 'string',
+            'birthDate' => 'date',
         ]);
 
         if($validator->fails()){
@@ -31,10 +39,10 @@ class RegisterController extends Controller
         }
 
         $input = $request->all();
-        $input['password'] = bcrypt($input['password']);
+        $input['password'] = Hash::make($input['password']);
         $user = User::create($input);
-        $success['token'] =  $user->createToken('MyApp')->plainTextToken;
-        $success['email'] =  $user->email;
+        $success['token'] =  $user->createToken('CesiCube')->plainTextToken;
+        $success['id'] =  $user->id;
 
         return $this->sendResponse($success, 'User register successfully.');
     }
@@ -49,30 +57,23 @@ class RegisterController extends Controller
     {
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
             $user = Auth::user();
-            $success['token'] =  $user->createToken('MyApp')->plainTextToken;
-            $success['email'] =  $user->email;
+            $success['token'] =  $user->createToken('CesiCube')->plainTextToken;
+            $success['id'] =  $user->id;
 
             return $this->sendResponse($success, 'User login successfully.');
         }
         else{
-            return $this->sendError('Unauthorised.', ['error'=>'Unauthorised']);
+            return $this->sendError('login failed', ['error'=>'Unauthorised']);
         }
     }
 
     /**
-     * @param Request $request
-     * @return RedirectResponse
+     * Login failed
+     *
+     * @return JsonResponse
      */
-    public function ForgotPassword(Request $request): RedirectResponse
+    public function login_failed(): JsonResponse
     {
-        $request->validate(['email' => 'required|email']);
-
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with(['status' => __($status)])
-            : back()->withErrors(['email' => __($status)]);
+        return $this->sendError('Access forbidden', ['error'=>'Unauthorised']);
     }
 }

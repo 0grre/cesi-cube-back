@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -15,7 +17,7 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(User::all())->withCookie('success', 'Users found successfully.');;
+        return $this->sendResponse(User::all(), 'Users found successfully.');;
     }
 
     /**
@@ -26,7 +28,7 @@ class UserController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        return response()->json(self::UserValidator($request))->withCookie('success', 'User created successfully.');
+        return $this->sendResponse(self::UserValidator($request), 'User created successfully.');
     }
 
     /**
@@ -43,7 +45,7 @@ class UserController extends Controller
             return $this->sendError('User not found.');
         }
 
-        return response()->json($user)->withCookie('success', 'User found successfully.');
+        return $this->sendResponse($user, 'User found successfully.');
     }
 
     /**
@@ -55,7 +57,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id): JsonResponse
     {
-        return response()->json(self::UserValidator($request, $id));
+        return $this->sendResponse(self::UserValidator($request, $id), 'User updated successfully.');
     }
 
     /**
@@ -71,7 +73,9 @@ class UserController extends Controller
             return $this->sendError('User not found.');
         }
 
-        return response()->json($user)->withCookie('success', 'User deleted successfully.');
+        $user->disabled_at = date('Y-m-d H:i:s');
+
+        return $this->sendResponse($user, 'User disabled successfully.');
     }
 
     /**
@@ -81,20 +85,18 @@ class UserController extends Controller
      */
     public function UserValidator(Request $request, $id = null): User|JsonResponse
     {
-
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|unique',
-            'password' => 'required|string',
+            'email' => 'email|unique',
+            'password' => 'string|min:4',
             'firstname' => 'string|min:2|max:55',
             'lastname' => 'string|min:2|max:55',
             'address1' => 'string|min:2|max:255',
             'address2' => 'string|min:2|max:255',
-            'zipCode' => 'regex:\d{5}',
+            'zipCode' => 'integer',
             'city' => 'string|min:2|max:55',
             'primaryPhone' => 'string',
             'secondaryPhone' => 'string',
             'birthDate' => 'date',
-            'disabledAt' => 'date',
         ]);
 
         if($validator->fails()){
@@ -102,7 +104,16 @@ class UserController extends Controller
         }
 
         $user = $id ? User::find($id) : new User();
-        $user->email = $request->email;
+
+        if($request->email) {
+            $user->email = $request->email;
+        }
+        if($request->password){
+            $user->password = Hash::make($request->password);
+        }
+        if(!empty($request->avatar)){
+            $user->avatar = Storage::url(Storage::disk('public')->put('medias', $request->avatar));
+        }
         $user->firstname = $request->firstname;
         $user->lastname = $request->lastname;
         $user->address1 = $request->address1;

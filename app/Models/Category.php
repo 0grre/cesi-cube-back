@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
@@ -18,10 +18,10 @@ class Category extends Model
     ];
 
     /**
-     * @return BelongsToMany
+     * @return HasMany
      */
-    public function resources(): BelongsToMany
+    public function resources(): HasMany
     {
-        return $this->belongsToMany(Resource::class);
+        return $this->hasMany(Resource::class);
     }
 }

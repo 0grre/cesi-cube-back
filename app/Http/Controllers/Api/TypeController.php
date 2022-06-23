@@ -19,7 +19,7 @@ class TypeController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(Type::all())->withCookie('success', 'Types retrieved successfully.');
+        return $this->sendResponse(Type::all(), 'Types retrieved successfully.');
     }
 
     /**
@@ -30,7 +30,7 @@ class TypeController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        return response()->json(self::TypeValidator($request))->withCookie('success', 'Type created successfully.');
+        return $this->sendResponse(self::TypeValidator($request), 'Type created successfully.');
     }
 
     /**
@@ -48,7 +48,7 @@ class TypeController extends Controller
             return $this->sendError('Type not found.');
         }
 
-        return response()->json(self::TypeValidator($type))->withCookie('success', 'Type found successfully.');
+        return $this->sendResponse(self::TypeValidator($type), 'Type found successfully.');
     }
 
     /**
@@ -60,7 +60,7 @@ class TypeController extends Controller
      */
     public function update(Request $request, $id): JsonResponse
     {
-        return response()->json(self::TypeValidator($request, $id))->withCookie('success', 'Type updated successfully.');
+        return $this->sendResponse(self::TypeValidator($request, $id), 'Type updated successfully.');
     }
 
     /**

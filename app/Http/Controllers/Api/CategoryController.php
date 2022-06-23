@@ -15,7 +15,7 @@ class CategoryController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(Category::all())->withCookie('success', 'Categories retrieved successfully.');
+        return $this->sendResponse(Category::all(), 'Categories retrieved successfully.');
     }
 
     /**
@@ -26,7 +26,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        return response()->json(self::CategoryValidator($request))->withCookie('success', 'Category created successfully.');
+        return $this->sendResponse(self::CategoryValidator($request), 'Category created successfully.');
     }
 
     /**
@@ -44,7 +44,7 @@ class CategoryController extends Controller
             return $this->sendError('Category not found.');
         }
 
-        return response()->json(self::CategoryValidator($category))->withCookie('success', 'Category found successfully.');
+        return $this->sendResponse(self::CategoryValidator($category), 'Category found successfully.');
     }
 
     /**
@@ -56,7 +56,7 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id): JsonResponse
     {
-        return response()->json(self::CategoryValidator($request, $id))->withCookie('success', 'Category updated successfully.');
+        return $this->sendResponse(self::CategoryValidator($request, $id), 'Category updated successfully.');
     }
 
     /**
