@@ -34,15 +34,15 @@ class RegisterController extends Controller
             'birthDate' => 'date',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Validation Error.', (array)$validator->errors());
         }
 
         $input = $request->all();
         $input['password'] = Hash::make($input['password']);
         $user = User::create($input);
-        $success['token'] =  $user->createToken('CesiCube')->plainTextToken;
-        $success['id'] =  $user->id;
+        $success['token'] = $user->createToken('CesiCube')->plainTextToken;
+        $success['id'] = $user->id;
 
         return $this->sendResponse($success, 'User register successfully.');
     }
@@ -55,16 +55,15 @@ class RegisterController extends Controller
      */
     public function login(Request $request): JsonResponse
     {
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = Auth::user();
-            $success['token'] =  $user->createToken('CesiCube')->plainTextToken;
-            $success['id'] =  $user->id;
+            $success['token'] = $user->createToken('CesiCube')->plainTextToken;
+            $success['id'] = $user->id;
 
             return $this->sendResponse($success, 'User login successfully.');
         }
-        else{
-            return $this->sendError('login failed', ['error'=>'Unauthorised']);
-        }
+
+        return $this->sendError('login failed', ['error' => 'Unauthorized']);
     }
 
     /**
@@ -74,6 +73,6 @@ class RegisterController extends Controller
      */
     public function login_failed(): JsonResponse
     {
-        return $this->sendError('Access forbidden', ['error'=>'Unauthorised']);
+        return $this->sendError('Access forbidden', ['error' => 'Unauthorized']);
     }
 }
