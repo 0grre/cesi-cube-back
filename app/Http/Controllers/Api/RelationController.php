@@ -89,13 +89,21 @@ class RelationController extends Controller
      */
     public function RelationValidator(Request $request, $user_id, $id = null): JsonResponse
     {
+        $relation = Relation::where('first_user_id', $user_id)
+            ->orWhere('second_user_id', $user_id)
+            ->where(function($query) use ($request) {
+                $query->where('first_user_id', $request->second_user_id)
+                    ->orWhere('second_user_id', $request->second_user_id);
+            })
+            ->exists();
+
         $validator = Validator::make($request->all(), [
             'second_user_id' => 'required',
             'relation_type_id' => 'required',
         ]);
 
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', (array)$validator->errors());
+        if($validator->fails() or $relation){
+            return $this->sendError('Validation Error.', $relation ? 'Relation exist' : (array)$validator->errors());
         }
 
         $relation = $id ? Relation::find($id) : new Relation();

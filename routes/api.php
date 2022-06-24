@@ -64,4 +64,11 @@ Route::middleware('auth:sanctum')->group( function () {
 
 Route::get('/test', function () {
 
+    return response()->json(Relation::where('first_user_id', 6)
+        ->orWhere('second_user_id', 6)
+        ->where(function($query){
+            $query->where('first_user_id', 5)
+                ->orWhere('second_user_id', 5);
+        })
+        ->exists());
 });
