@@ -21,16 +21,16 @@ class RegisterController extends Controller
     public function register(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|unique',
+            'email' => 'required|email|unique:users',
             'password' => 'required|string|min:4',
             'firstname' => 'string|min:2|max:55',
             'lastname' => 'string|min:2|max:55',
             'address1' => 'string|min:2|max:255',
-            'address2' => 'string|min:2|max:255',
-            'zipCode' => 'regex:\d{5}',
+            'address2' => 'string|min:2|max:255|nullable',
+            'zipCode' => 'regex:/\w{20}/',
             'city' => 'string|min:2|max:55',
             'primaryPhone' => 'string',
-            'secondaryPhone' => 'string',
+            'secondaryPhone' => 'string|nullable',
             'birthDate' => 'date',
         ]);
 
