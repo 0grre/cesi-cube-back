@@ -64,9 +64,4 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/test', function () {
 
-
-    return DB::table('relations')
-        ->whereIn('first_user_id', [9, 4])
-        ->whereIn('second_user_id', [9, 4])
-        ->exists();
 });
