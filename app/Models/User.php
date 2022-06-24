@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -66,5 +67,17 @@ class User extends Authenticatable
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * User Relation
+     *
+     * The users that belong to the role.
+     */
+    public function relations(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'relations', 'user_id', 'user2_id')
+            ->withPivot( 'relation_type_id')
+            ->withTimestamps();
     }
 }
