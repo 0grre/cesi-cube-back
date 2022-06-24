@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RelationResource;
 use App\Models\Relation;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class RelationController extends Controller
@@ -25,8 +26,6 @@ class RelationController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
      * @param Request $request
      * @param $user_id
      * @return JsonResponse
@@ -39,12 +38,13 @@ class RelationController extends Controller
     /**
      * Display the specified resource.
      *
+     * @param $user_id
      * @param $id
      * @return JsonResponse
      */
-    public function show($id): JsonResponse
+    public function show($user_id, $id): JsonResponse
     {
-        $relation = Relation::find($id);
+        $relation = Relation::where('id', $id)->get();
 
         if (is_null($relation)) {
             return $this->sendError('Relation not found.');
@@ -54,20 +54,23 @@ class RelationController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-
+     * @param Request $request
+     * @param $user_id
+     * @param $id
+     * @return JsonResponse
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update(Request $request, $user_id, $id): JsonResponse
     {
-        return $this->sendResponse(self::RelationValidator($request, $user_id = null, $id), 'Relation updated successfully.');
+        return $this->sendResponse(self::RelationValidator($request, $user_id, $id), 'Relation updated successfully.');
     }
 
     /**
      *
+     * @param $user_id
      * @param $id
      * @return JsonResponse
      */
-    public function destroy($id): JsonResponse
+    public function destroy($user_id, $id): JsonResponse
     {
         $relation = Relation::find($id);
 
@@ -80,21 +83,19 @@ class RelationController extends Controller
         return $this->sendResponse([], 'Relation deleted successfully.');
     }
 
+
     /**
-     *
      * @param Request $request
-     * @param null $user_id
-     * @param null $id
-     * @return JsonResponse
+     * @param $user_id
+     * @param $id
+     * @return JsonResponse|AnonymousResourceCollection
      */
-    public function RelationValidator(Request $request, $user_id, $id = null): JsonResponse
+    public function RelationValidator(Request $request, $user_id, $id = null): JsonResponse|AnonymousResourceCollection
     {
-        $relation = Relation::where('first_user_id', $user_id)
-            ->orWhere('second_user_id', $user_id)
-            ->where(function($query) use ($request) {
-                $query->where('first_user_id', $request->second_user_id)
-                    ->orWhere('second_user_id', $request->second_user_id);
-            })
+
+        $relation = DB::table('relations')
+            ->whereIn('first_user_id', [$user_id, $request->second_user_id])
+            ->whereIn('second_user_id', [$user_id, $request->second_user_id])
             ->exists();
 
         $validator = Validator::make($request->all(), [
@@ -102,8 +103,9 @@ class RelationController extends Controller
             'relation_type_id' => 'required',
         ]);
 
-        if($validator->fails() or $relation){
-            return $this->sendError('Validation Error.', $relation ? 'Relation exist' : (array)$validator->errors());
+        if($validator->fails() or (!$id && $relation)){
+            return $this->sendError('Validation Error.',
+                $relation ? ['Relation with user '. $request->second_user_id .' exist'] : (array)$validator->errors());
         }
 
         $relation = $id ? Relation::find($id) : new Relation();
@@ -112,6 +114,6 @@ class RelationController extends Controller
         $relation->relation_type_id = $request->relation_type_id;
         $relation->save();
 
-        return $relation;
+        return RelationResource::collection(Relation::where('id', $relation->id)->get());
     }
 }

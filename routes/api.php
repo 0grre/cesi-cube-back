@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Models\Relation;
 use App\Models\Type;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,7 +22,7 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [RegisterController::class, 'login']);
 Route::get('/login', [RegisterController::class, 'login_failed'])->name('login');
 
-Route::middleware('auth:sanctum')->group( function () {
+Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/{id}', [UserController::class, 'show']);
@@ -30,10 +31,9 @@ Route::middleware('auth:sanctum')->group( function () {
 
     Route::get('/users/{user}/relations', [RelationController::class, 'index']);
     Route::post('/users/{user}/relations', [RelationController::class, 'store']);
-
-    Route::get('/relations/{id}', [RelationController::class, 'show']);
-    Route::put('/relations/{id}', [RelationController::class, 'update']);
-    Route::delete('/relations/{id}', [RelationController::class, 'destroy']);
+    Route::get('/users/{user}/relations/{id}', [RelationController::class, 'show']);
+    Route::put('/users/{user}/relations/{relation}', [RelationController::class, 'update']);
+    Route::delete('/users/{user}/relations/{id}', [RelationController::class, 'destroy']);
 
     Route::get('/types', [TypeController::class, 'index']);
     Route::get('/types/{id}', [TypeController::class, 'show']);
@@ -64,11 +64,9 @@ Route::middleware('auth:sanctum')->group( function () {
 
 Route::get('/test', function () {
 
-    return response()->json(Relation::where('first_user_id', 6)
-        ->orWhere('second_user_id', 6)
-        ->where(function($query){
-            $query->where('first_user_id', 5)
-                ->orWhere('second_user_id', 5);
-        })
-        ->exists());
+
+    return DB::table('relations')
+        ->whereIn('first_user_id', [9, 4])
+        ->whereIn('second_user_id', [9, 4])
+        ->exists();
 });
