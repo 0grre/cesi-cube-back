@@ -1,0 +1,130 @@
+@startuml
+package "(RE)Sources Relationnelles" {
+hide methods
+
+class User {
+    - Number id
+    - String password
+    - String email
+    - String lastname
+    - String firstname
+    - Date birthdate
+    - String address1
+    - String address2
+    - String zipCode
+    - String city
+    - String primaryPhone
+    - String secondaryPhone
+    - Datetime created_at
+    - Datetime updated_at
+    - Datetime deleted_at
+    - Comment[] comments
+    - Relation[] relations
+    - Ressource[] ressources
+    - Ressource[] readLater
+    - Ressource[] favorites
+    - RelationRequest[] requestsMade
+    - RelationRequest[] requestsReceived
+}
+
+
+class RelationType{
+    - String type
+}
+note top of RelationType: CONJOINT, FAMILLE, PROFESSIONNEL, AMI, INCONNU
+
+class RelationRequest {
+  User requester
+  User user
+  ERelationRequestStatus status
+  Datetime created_at
+  Datetime updated_at
+}
+
+enum ERelationRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+class Ressource {
+    - Number views
+    - String title
+    - String[] mediaUrl
+    - String richTextContent
+    - String tags
+    - Date created_at
+    - Date updated_at
+    - Date deleted_at
+    - Bool isExploited
+    - RessourceType type
+    - RessourceCategory category
+    - ERessourceStatus status
+    - User creator
+    - EScope scope
+}
+
+enum ERessourceStatus{
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
+enum EScope {
+  PRIVATE
+  SHARED
+  PUBLIC
+}
+
+note bottom of EScope: PRIVATE = only visible by the creator, SHARED = only visible by creator's relations, PUBLIC = visible by anyone
+
+class RessourceCategory {
+    - String label
+    - Date created_at
+    - Date updated_at
+}
+
+class RessourceType {
+    String label
+    Date created_at
+    Date updated_at
+}
+
+class Comment {
+    - String content
+    - Ressource ressource
+    - Datetime created_at
+    - Datetime updated_at
+    - Datetime deleted_at
+}
+
+class Relation {
+  - User user1
+  - User user2
+  - RelationType type
+  - Datetime created_at
+  - Datetime updated_at
+}
+
+
+User::relations "0..many" --> "1..1" Relation : has
+Relation::user2 "1..1"--> "many..1" User::relations : concerns
+Relation::type "1..1" -> "many..1" RelationType
+
+User::requestsMade "0..many" ----> "1..1" RelationRequest::requester: has
+RelationRequest::status -- ERelationRequestStatus
+RelationRequest::user "1..1" --> "many..0" User::requestsReceived: concerns
+
+User::ressources "0..many" -> "1..1" Ressource: creates
+User::favorites "0..many" -> Ressource: has
+User::readLater "0..many" -> Ressource: has
+
+User::comments "0..many" --> Comment: writes
+Comment::ressource --> "many..1" Ressource: concerns
+
+Ressource::scope "1..1" --> EScope: visibility
+Ressource::type "1..1" --> "many..1" RessourceType: is
+Ressource::status  --  ERessourceStatus
+Ressource::category "1..1" --> "many..1" RessourceCategory: is
+}
+@enduml
