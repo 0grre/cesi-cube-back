@@ -70,14 +70,11 @@ class User extends Authenticatable
     }
 
     /**
-     * User Relation
-     *
-     * The users that belong to the role.
+     * @return HasMany
      */
-    public function relations(): BelongsToMany
+    public function relations(): HasMany
     {
-        return $this->belongsToMany(User::class, 'relations', 'user_id', 'user2_id')
-            ->withPivot( 'relation_type_id')
-            ->withTimestamps();
+        return $this->hasMany(Relation::class, 'first_user_id');
     }
+
 }

@@ -17,10 +17,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('relation_type_id')->nullable()->unsigned();
             $table->foreign('relation_type_id')->references('id')->on('relation_types')->onDelete('cascade');
-            $table->unsignedBigInteger('user_id')->nullable()->unsigned();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->unsignedBigInteger('user2_id')->nullable()->unsigned();
-            $table->foreign('user2_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('first_user_id')->nullable()->unsigned();
+            $table->foreign('first_user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('second_user_id')->nullable()->unsigned();
+            $table->foreign('second_user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\RelationResource;
+use App\Models\Relation;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class RelationController extends Controller
@@ -17,10 +18,10 @@ class RelationController extends Controller
      */
     public function index($user_id): JsonResponse
     {
-        $user_relations = User::find($user_id)->relations()->get();
-        $user2_relations = User::find($user_id)->relations()->get();
+        $relations = Relation::where('first_user_id', $user_id)
+            ->orWhere('second_user_id', $user_id)->get();
 
-        return $this->sendResponse($relations, 'Relations retrieved successfully.');
+        return $this->sendResponse(RelationResource::collection($relations), 'Relations retrieved successfully.');
     }
 
     /**
@@ -28,55 +29,53 @@ class RelationController extends Controller
      *
      * @param Request $request
      * @param $user_id
-     * @param $user2_id
      * @return JsonResponse
      */
-    public function store(Request $request, $user_id, $user2_id): JsonResponse
+    public function store(Request $request, $user_id): JsonResponse
     {
-        return $this->sendResponse(self::RelationValidator($request, $user_id, $user2_id), 'Relation created successfully.');
+        return $this->sendResponse(self::RelationValidator($request, $user_id), 'Relation created successfully.');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param $user_id
-     * @param $user2_id
+     * @param $id
      * @return JsonResponse
      */
-    public function show($user_id, $user2_id): JsonResponse
+    public function show($id): JsonResponse
     {
+        $relation = Relation::find($id);
 
-        $user = User::find($user_id);
-
-        $relations = $user->relations()->where('user2-id', $user2_id)->get();
-
-        if (is_null($relations)) {
+        if (is_null($relation)) {
             return $this->sendError('Relation not found.');
         }
 
-        return $this->sendResponse($relations, 'Relation found successfully.');
+        return $this->sendResponse(RelationResource::collection($relation), 'Relation found successfully.');
     }
 
     /**
      * Update the specified resource in storage.
 
      */
-    public function update(Request $request, $user_id, $user2_id): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
-        return $this->sendResponse(self::RelationValidator($request, $user_id, $user2_id), 'Relation updated successfully.');
+        return $this->sendResponse(self::RelationValidator($request, $user_id = null, $id), 'Relation updated successfully.');
     }
 
     /**
      *
-     * @param $user_id
-     * @param $user2_id
+     * @param $id
      * @return JsonResponse
      */
-    public function destroy($user_id, $user2_id): JsonResponse
+    public function destroy($id): JsonResponse
     {
-        $user = User::find($user_id);
+        $relation = Relation::find($id);
 
-        $user->relations()->detach($user2_id);
+        if (is_null($relation)) {
+            return $this->sendError('Relation not found.');
+        }
+
+        $relation->delete();
 
         return $this->sendResponse([], 'Relation deleted successfully.');
     }
@@ -85,14 +84,13 @@ class RelationController extends Controller
      *
      * @param Request $request
      * @param null $user_id
-     * @param $user2_id
+     * @param null $id
      * @return JsonResponse
      */
-    public function RelationValidator(Request $request, $user_id, $user2_id): JsonResponse
+    public function RelationValidator(Request $request, $user_id, $id = null): JsonResponse
     {
-        $user = User::find($user_id);
-
         $validator = Validator::make($request->all(), [
+            'second_user_id' => 'required',
             'relation_type_id' => 'required',
         ]);
 
@@ -100,10 +98,12 @@ class RelationController extends Controller
             return $this->sendError('Validation Error.', (array)$validator->errors());
         }
 
-        $user->relations()->sync([
-            $user2_id => ['relation_type_id' => $request->relation_type_id]
-        ]);
+        $relation = $id ? Relation::find($id) : new Relation();
+        $relation->first_user_id = $user_id;
+        $relation->second_user_id = $request->second_user_id;
+        $relation->relation_type_id = $request->relation_type_id;
+        $relation->save();
 
-        return $user->relations()->first();
+        return $relation;
     }
 }

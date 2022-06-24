@@ -30,9 +30,10 @@ Route::middleware('auth:sanctum')->group( function () {
 
     Route::get('/users/{user}/relations', [RelationController::class, 'index']);
     Route::post('/users/{user}/relations', [RelationController::class, 'store']);
-    Route::get('/users/{user}/relations/{relation}', [RelationController::class, 'show']);
-    Route::put('/users/{user}/relations/{relation}', [RelationController::class, 'update']);
-    Route::delete('/users/{user}/relations/{relation}', [RelationController::class, 'destroy']);
+
+    Route::get('/relations/{id}', [RelationController::class, 'show']);
+    Route::put('/relations/{id}', [RelationController::class, 'update']);
+    Route::delete('/relations/{id}', [RelationController::class, 'destroy']);
 
     Route::get('/types', [TypeController::class, 'index']);
     Route::get('/types/{id}', [TypeController::class, 'show']);
@@ -63,17 +64,4 @@ Route::middleware('auth:sanctum')->group( function () {
 
 Route::get('/test', function () {
 
-    $user1 = User::find(rand(1, 10));
-    $user2 = User::find(rand(1, 10));
-    $relation_type = \App\Models\RelationType::find(rand(1, 4));
-    $user = User::find(2);
-
-
-//    $user->users()->attach($user2->id);
-    $user->relations()->sync([$user2->id => ['relation_type_id' => 3]]);
-//    $user->users()->first()->pivot->relation_type_id = 1;
-//    $user->users()->first()->pivot->save();
-
-
-    return $user->users()->first();
 });
