@@ -42,7 +42,7 @@ class RegisterController extends Controller
         $input['password'] = Hash::make($input['password']);
         $user = User::create($input);
         $success['token'] = $user->createToken('CesiCube')->plainTextToken;
-        $success['id'] = $user->id;
+        $success['user'] = $user;
 
         return $this->sendResponse($success, 'User register successfully.');
     }
@@ -58,7 +58,7 @@ class RegisterController extends Controller
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = Auth::user();
             $success['token'] = $user->createToken('CesiCube')->plainTextToken;
-            $success['id'] = $user->id;
+            $success['user'] = $user;
 
             return $this->sendResponse($success, 'User login successfully.');
         }
