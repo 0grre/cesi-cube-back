@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -17,7 +18,7 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(User::all(), 'Users found successfully.');
+        return $this->sendResponse(DB::table('users')->paginate(10), 'Users found successfully.');
     }
 
     /**
@@ -55,10 +56,9 @@ class UserController extends Controller
      * @param $id
      * @return JsonResponse
      */
-    public function update(Request $request): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
         $this->UserValidator($request);
-        $id = $request->input('id');
         $user = $id ? User::find($id) : new User();
 
         $user->email = $request->email ?? $user->email;

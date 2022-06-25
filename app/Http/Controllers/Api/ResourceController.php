@@ -7,6 +7,7 @@ use App\Models\Resource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -18,7 +19,7 @@ class ResourceController extends Controller
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(Resource::all(), 'Resources found successfully.');;
+        return $this->sendResponse(DB::table('resources')->paginate(10), 'Resources found successfully.');
     }
 
     /**
@@ -30,7 +31,7 @@ class ResourceController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        return $this->sendResponse(self::ResourceValidator($request), 'Resource created successfully.');
+        return $this->sendResponse($this->ResourceValidator($request), 'Resource created successfully.');
     }
 
     /**
@@ -60,7 +61,7 @@ class ResourceController extends Controller
      */
     public function update(Request $request, $id): JsonResponse
     {
-        return $this->sendResponse(self::ResourceValidator($request, $id), 'Resource updated successfully.');
+        return $this->sendResponse($this->ResourceValidator($request, $id), 'Resource updated successfully.');
     }
 
     /**
@@ -119,7 +120,7 @@ class ResourceController extends Controller
 
         $resource->type_id = $request->type_id;
         $resource->category_id = $request->category_id;
-        $resource->user_id = Auth::user()->getAuthIdentifier();
+        $resource->user_id = Auth::user()?->getAuthIdentifier();
 
         $resource->save();
 
