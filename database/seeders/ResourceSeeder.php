@@ -16,6 +16,18 @@ class ResourceSeeder extends Seeder
      */
     public function run(): void
     {
+        $status = [
+            'pending',
+            'accepted',
+            'rejected'
+        ];
+
+        $scopes = [
+            'private',
+            'public',
+            'shared'
+        ];
+
         foreach (User::all() as $user) {
             for ($i = 0; $i < 5; $i++) {
                 $resource = new Resource();
@@ -26,8 +38,8 @@ class ResourceSeeder extends Seeder
                 Diam maecenas sed enim ut. Accumsan lacus vel facilisis volutpat est. Ut aliquam purus sit amet luctus.
                 Lorem ipsum dolor sit amet consectetur adipiscing elit ut.";
                 $resource->tags = "test tag";
-                $resource->status = 'test status';
-                $resource->scope = "test scopes";
+                $resource->status = $status[rand(0,2)];
+                $resource->scope = $scopes[rand(0,2)];
                 $resource->is_exploited = true;
                 $resource->type_id = rand(1, 4);
                 $resource->category_id = rand(1, 13);

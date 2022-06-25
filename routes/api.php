@@ -3,14 +3,11 @@
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\RelationController;
+use App\Http\Controllers\Api\RelationTypeController;
 use App\Http\Controllers\Api\ResourceController;
 use App\Http\Controllers\Api\TypeController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Models\Relation;
-use App\Models\Type;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,6 +31,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users/{user}/relations/{id}', [RelationController::class, 'show']);
     Route::put('/users/{user}/relations/{relation}', [RelationController::class, 'update']);
     Route::delete('/users/{user}/relations/{id}', [RelationController::class, 'destroy']);
+
+    Route::get('/relation_types', [RelationTypeController::class, 'index']);
+    Route::get('/relation_types/{id}', [RelationTypeController::class, 'show']);
+    Route::post('/relation_types', [RelationTypeController::class, 'store']);
+    Route::put('/relation_types/{id}', [RelationTypeController::class, 'update']);
+    Route::delete('/relation_types/{id}', [RelationTypeController::class, 'destroy']);
 
     Route::get('/types', [TypeController::class, 'index']);
     Route::get('/types/{id}', [TypeController::class, 'show']);

@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Type;
+use App\Models\RelationType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class TypeController extends Controller
+class RelationTypeController extends Controller
 {
     /**
      * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(Type::all(), 'Types retrieved successfully.');
+        return $this->sendResponse(RelationType::all(), 'RelationTypes retrieved successfully.');
     }
 
     /**
@@ -26,7 +26,7 @@ class TypeController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        return $this->sendResponse(self::TypeValidator($request), 'Type created successfully.');
+        return $this->sendResponse(self::RelationTypeValidator($request), 'RelationType created successfully.');
     }
 
     /**
@@ -38,13 +38,13 @@ class TypeController extends Controller
     public function show($id): JsonResponse
     {
 
-        $type = Type::find($id);
+        $relation_type = RelationType::find($id);
 
-        if (is_null($type)) {
-            return $this->sendError('Type not found.');
+        if (is_null($relation_type)) {
+            return $this->sendError('RelationType not found.');
         }
 
-        return $this->sendResponse(self::TypeValidator($type), 'Type found successfully.');
+        return $this->sendResponse(self::RelationTypeValidator($relation_type), 'RelationType found successfully.');
     }
 
     /**
@@ -56,7 +56,7 @@ class TypeController extends Controller
      */
     public function update(Request $request, $id): JsonResponse
     {
-        return $this->sendResponse(self::TypeValidator($request, $id), 'Type updated successfully.');
+        return $this->sendResponse(self::RelationTypeValidator($request, $id), 'RelationType updated successfully.');
     }
 
     /**
@@ -66,31 +66,31 @@ class TypeController extends Controller
      */
     public function destroy($id): JsonResponse
     {
-        Type::find($id)->delete();
+        RelationType::find($id)->delete();
 
-        return $this->sendResponse([], 'Type deleted successfully.');
+        return $this->sendResponse([], 'RelationType deleted successfully.');
     }
 
     /**
      * @param Request $request
      * @param null $id
-     * @return Type|JsonResponse
+     * @return RelationType|JsonResponse
      */
-    public function TypeValidator(Request $request, $id = null): Type|JsonResponse
+    public function RelationTypeValidator(Request $request, $id = null): RelationType|JsonResponse
     {
 
         $validator = Validator::make($request->all(), [
-            'label' => 'required|string|min:2|max:255',
+            'name' => 'required|string|min:2|max:55',
         ]);
 
         if($validator->fails()){
             return $this->sendError('Validation Error.', (array)$validator->errors());
         }
 
-        $type = $id ? Type::find($id) : new Type();
-        $type->label = $request->label;
-        $type->save();
+        $relation_type = $id ? RelationType::find($id) : new RelationType();
+        $relation_type->name = $request->name;
+        $relation_type->save();
 
-        return $type;
+        return $relation_type;
     }
 }
