@@ -17,7 +17,7 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(User::all(), 'Users found successfully.');;
+        return $this->sendResponse(User::all(), 'Users found successfully.');
     }
 
     /**
@@ -28,7 +28,7 @@ class UserController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        return $this->sendResponse(self::UserValidator($request), 'User created successfully.');
+        return $this->sendResponse($this->UserValidator($request), 'User created successfully.');
     }
 
     /**
@@ -55,9 +55,27 @@ class UserController extends Controller
      * @param $id
      * @return JsonResponse
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update(Request $request): JsonResponse
     {
-        return $this->sendResponse(self::UserValidator($request, $id), 'User updated successfully.');
+        $this->UserValidator($request);
+        $id = $request->input('id');
+        $user = $id ? User::find($id) : new User();
+
+        $user->email = $request->email ?? $user->email;
+        $user->password = $request->password ? Hash::make($request->password) : $user->password;
+        $user->avatar = $request->avatar ? Storage::url(Storage::disk('public')->put('medias', $request->avatar)) : $user->avatar;
+        $user->firstname = $request->firstname ?? $user->firstname;
+        $user->lastname = $request->lastname ?? $user->lastname;
+        $user->address1 = $request->address1 ?? $user->address1;
+        $user->address2 = $request->address2 ?? $user->address2;
+        $user->zipCode = $request->zipCode ?? $user->zipCode;
+        $user->city = $request->city ?? $user->city;
+        $user->primaryPhone = $request->primaryPhone ?? $user->primaryPhone;
+        $user->secondaryPhone = $request->secondaryPhone ?? $user->secondaryPhone;
+        $user->birthDate = $request->birthDate ?? $user->birthDate;
+        $user->save();
+
+        return $this->sendResponse($user, 'User updated successfully.');
     }
 
     /**
@@ -81,51 +99,26 @@ class UserController extends Controller
 
     /**
      * @param Request $request
-     * @param null $id
-     * @return User|JsonResponse
+     * @return JsonResponse|void
      */
-    public function UserValidator(Request $request, $id = null): User|JsonResponse
+    public function UserValidator(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'email|unique',
-            'password' => 'string|min:4',
-            'firstname' => 'string|min:2|max:55',
-            'lastname' => 'string|min:2|max:55',
-            'address1' => 'string|min:2|max:255',
-            'address2' => 'string|min:2|max:255',
-            'zipCode' => 'integer',
-            'city' => 'string|min:2|max:55',
-            'primaryPhone' => 'string',
-            'secondaryPhone' => 'string',
-            'birthDate' => 'date',
+            'email' => 'email|unique:users|nullable',
+            'password' => 'string|min:4|nullable',
+            'firstname' => 'string|min:2|max:55|nullable',
+            'lastname' => 'string|min:2|max:55|nullable',
+            'address1' => 'string|min:2|max:255|nullable',
+            'address2' => 'string|min:2|max:255|nullable',
+            'zipCode' => 'string|min:2|max:20|nullable',
+            'city' => 'string|min:2|max:55|nullable',
+            'primaryPhone' => 'string|nullable',
+            'secondaryPhone' => 'string|nullable',
+            'birthDate' => 'date|nullable',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Validation Error.', (array)$validator->errors());
         }
-
-        $user = $id ? User::find($id) : new User();
-
-        if($request->email) {
-            $user->email = $request->email;
-        }
-        if($request->password){
-            $user->password = Hash::make($request->password);
-        }
-        if(!empty($request->avatar)){
-            $user->avatar = Storage::url(Storage::disk('public')->put('medias', $request->avatar));
-        }
-        $user->firstname = $request->firstname;
-        $user->lastname = $request->lastname;
-        $user->address1 = $request->address1;
-        $user->address2 = $request->address2;
-        $user->zipCode = $request->zipCode;
-        $user->city = $request->city;
-        $user->primaryPhone = $request->primaryPhone;
-        $user->secondaryPhone = $request->secondaryPhone;
-        $user->birthDate = $request->birthDate;
-        $user->save();
-
-        return $user;
     }
 }

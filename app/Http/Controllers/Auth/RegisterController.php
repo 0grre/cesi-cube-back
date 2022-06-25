@@ -27,7 +27,7 @@ class RegisterController extends Controller
             'lastname' => 'string|min:2|max:55',
             'address1' => 'string|min:2|max:255',
             'address2' => 'string|min:2|max:255|nullable',
-            'zipCode' => 'regex:/\w{20}/',
+            'zipCode' => 'string|min:2|max:20',
             'city' => 'string|min:2|max:55',
             'primaryPhone' => 'string',
             'secondaryPhone' => 'string|nullable',
