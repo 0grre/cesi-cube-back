@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Comment;
+use App\Models\Resource;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class CommentSeeder extends Seeder
@@ -12,8 +14,16 @@ class CommentSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
-        //
+        foreach (Resource::all() as $resource) {
+            foreach (User::all() as $user) {
+                $comment = new Comment;
+                $comment->content = 'lorem ipsum commentaire test';
+                $comment->resource_id = $resource->id;
+                $comment->user_id = $user->id;
+                $comment->save();
+            }
+        }
     }
 }

@@ -105,21 +105,22 @@ class ResourceController extends Controller
             return $this->sendError('Validation Error.', (array)$validator->errors());
         }
 
+        $decoded = base64_decode($request->mediaUrl);
+        $file = '/media';
+        file_put_contents($file, $decoded);
+
         $resource = $id ? Resource::find($id) : new Resource();
-        $resource->title = $request->title;
-        $resource->views = $request->views;
-        $resource->richTextContent = $request->richTextContent;
-        $resource->tags = $request->tags;
-        $resource->is_exploited = $request->is_exploited;
-        $resource->status = $request->status;
-        $resource->scope = $request->scope;
 
-        if(!empty($request->medialUrl)){
-            $resource->mediaUrl = Storage::url(Storage::disk('public')->put('medias', $request->mediaUrl));
-        }
-
-        $resource->type_id = $request->type_id;
-        $resource->category_id = $request->category_id;
+        $resource->title = $request->title ?? $resource->title;
+        $resource->views = $request->views ?? $resource->views;
+        $resource->richTextContent = $request->richTextContent ?? $resource->richTextContent;
+        $resource->mediaUrl = $request->mediaUrl ? Storage::url(Storage::disk('public')->putFile('medias', $file)) : $resource->mediaUrl;
+        $resource->tags = $request->tags ?? $resource->tags;
+        $resource->is_exploited = $request->is_exploited ?? $resource->is_exploited;
+        $resource->status = $request->status ?? $resource->status;
+        $resource->scope = $request->scope ?? $resource->scope;
+        $resource->type_id = $request->type_id ?? $resource->type_id;
+        $resource->category_id = $request->category_id ?? $resource->category_id;
         $resource->user_id = Auth::user()?->getAuthIdentifier();
 
         $resource->save();

@@ -67,7 +67,7 @@ class UserController extends Controller
 
         $user->email = $request->email ?? $user->email;
         $user->password = $request->password ? Hash::make($request->password) : $user->password;
-        $user->avatar = $request->avatar ? Storage::url(Storage::disk('public')->putFile('medias', $file)) : $user->avatar;
+        $user->avatar = $request->avatar ? Storage::url(Storage::disk('public')->putFile('avatars', $file)) : $user->avatar;
         $user->firstname = $request->firstname ?? $user->firstname;
         $user->lastname = $request->lastname ?? $user->lastname;
         $user->address1 = $request->address1 ?? $user->address1;
