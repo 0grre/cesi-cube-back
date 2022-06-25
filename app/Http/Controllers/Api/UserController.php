@@ -61,9 +61,17 @@ class UserController extends Controller
         $this->UserValidator($request);
         $user = $id ? User::find($id) : new User();
 
+        $data = explode(';', $request->avatar);
+        $extension = explode('/', $data[0])[1];
+        $avatar_encoded = explode(':', $data[1])[1];
+
+        $decoded = base64_decode($avatar_encoded);
+        $file = '/avatar/avatar.'. $extension;
+        file_put_contents($file, $decoded);
+
         $user->email = $request->email ?? $user->email;
         $user->password = $request->password ? Hash::make($request->password) : $user->password;
-        $user->avatar = $request->avatar ? Storage::url(Storage::disk('public')->put('medias', $request->avatar)) : $user->avatar;
+        $user->avatar = $request->avatar ? Storage::url(Storage::disk('public')->putFile('medias', $file)) : $user->avatar;
         $user->firstname = $request->firstname ?? $user->firstname;
         $user->lastname = $request->lastname ?? $user->lastname;
         $user->address1 = $request->address1 ?? $user->address1;
