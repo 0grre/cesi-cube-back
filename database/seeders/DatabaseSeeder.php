@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             TypeCategorySeeder::class,
             ResourceSeeder::class,
             CommentSeeder::class,
+            ProgressionUserSeeder::class,
         ]);
     }
 }

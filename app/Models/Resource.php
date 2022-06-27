@@ -61,4 +61,20 @@ class Resource extends Model
     {
         return $this->hasMany(Comment::class);
     }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function read_later(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)->using(ReadLater::class)->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function favorites(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)->using(ReadLater::class)->withTimestamps();
+    }
 }

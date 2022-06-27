@@ -87,4 +87,24 @@ class User extends Authenticatable
         $relations = collect($this->hasMany(RelationRequest::class, 'first_user_id')->get());
         return $relations->merge(collect($this->hasMany(Relation::class, 'second_user_id')->get()));
     }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function read_later(): BelongsToMany
+    {
+        return $this->belongsToMany(Resource::class, 'read_later')
+            ->using(ReadLater::class)
+            ->as('read_later')->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function favorites(): BelongsToMany
+    {
+        return $this->belongsToMany(Resource::class, 'favorites')
+            ->using(ReadLater::class)
+            ->as('favorites')->withTimestamps();
+    }
 }

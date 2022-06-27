@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Resource;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -117,6 +118,27 @@ class ResourceController extends Controller
         $resource->save();
 
         return $this->sendResponse([], 'Resource deleted successfully.');
+    }
+
+    /**
+     * @param $user_id
+     * @param $id
+     * @return JsonResponse
+     */
+    public function add_to_read_later($user_id, $id): JsonResponse
+    {
+        $user = User::find($user_id);
+        $resource = Resource::find($id);
+
+        if (!$user->read_later()->where('resource_id', $resource->id)->exists())
+        {
+            $user->read_later()->attach($resource);
+
+            return $this->sendResponse($user->read_later()->get(), 'Resource add to read later list successfully.');
+        } else {
+
+            return $this->sendError('Validation Error.', (array)'Resource read later exist');
+        }
     }
 
     /**

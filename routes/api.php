@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\ReadLaterController;
 use App\Http\Controllers\Api\RelationController;
 use App\Http\Controllers\Api\RelationRequestController;
 use App\Http\Controllers\Api\RelationTypeController;
@@ -9,6 +11,8 @@ use App\Http\Controllers\Api\ResourceController;
 use App\Http\Controllers\Api\TypeController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Models\Resource;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,6 +43,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/users/{user}/relation_requests/{relation_request}', [RelationRequestController::class, 'update']);
     Route::delete('/users/{user}/relation_requests/{id}', [RelationRequestController::class, 'destroy']);
 
+    Route::get('/users/{user}/favorites', [FavoriteController::class, 'index']);
+    Route::post('/users/{user}/favorites/{resource}', [FavoriteController::class, 'store']);
+    Route::delete('/users/{user}/favorites/{resource}', [FavoriteController::class, 'destroy']);
+
+    Route::get('/users/{user}/read_later', [ReadLaterController::class, 'index']);
+    Route::post('/users/{user}/read_later/{resource}', [ReadLaterController::class, 'store']);
+    Route::delete('/users/{user}/read_later/{resource}', [ReadLaterController::class, 'destroy']);
+
     Route::get('/relation_types', [RelationTypeController::class, 'index']);
     Route::get('/relation_types/{id}', [RelationTypeController::class, 'show']);
     Route::post('/relation_types', [RelationTypeController::class, 'store']);
@@ -68,8 +80,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/resources/{resource}/comments/{comment}', [CommentController::class, 'show']);
     Route::put('/resources/{resource}/comments/{comment}', [CommentController::class, 'update']);
     Route::delete('/resources/{resource}/comments/{comment}', [CommentController::class, 'destroy']);
-
-    Route::resource('resources', ResourceController::class);
 });
 
 Route::get('/test', function () {
