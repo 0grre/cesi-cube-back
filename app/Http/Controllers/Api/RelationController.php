@@ -19,10 +19,9 @@ class RelationController extends Controller
      */
     public function index($user_id): JsonResponse
     {
-        $relations = Relation::where('first_user_id', $user_id)
-            ->orWhere('second_user_id', $user_id)->get();
-
-        return $this->sendResponse(RelationResource::collection($relations), 'Relations retrieved successfully.');
+        return $this->sendResponse(
+            DB::table('relations')->where('first_user_id', $user_id)->orWhere('second_user_id', $user_id)->paginate(10),
+            'Relations retrieved successfully.');
     }
 
     /**
@@ -103,9 +102,9 @@ class RelationController extends Controller
             'relation_type_id' => 'required',
         ]);
 
-        if($validator->fails() or (!$id && $relation)){
+        if ($validator->fails() or (!$id && $relation)) {
             return $this->sendError('Validation Error.',
-                $relation ? ['Relation with user '. $request->second_user_id .' exist'] : (array)$validator->errors());
+                $relation ? ['Relation with user ' . $request->second_user_id . ' exist'] : (array)$validator->errors());
         }
 
         $relation = $id ? Relation::find($id) : new Relation();

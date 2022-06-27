@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [RegisterController::class, 'login']);
 Route::get('/login', [RegisterController::class, 'login_failed'])->name('login');
+Route::get('/resources', [ResourceController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -50,7 +51,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/categories/{id}', [CategoryController::class, 'update']);
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 
-    Route::get('/resources', [ResourceController::class, 'index']);
     Route::get('/resources/{id}', [ResourceController::class, 'show']);
     Route::post('/resources', [ResourceController::class, 'store']);
     Route::put('/resources/{id}', [ResourceController::class, 'update']);

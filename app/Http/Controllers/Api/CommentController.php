@@ -8,6 +8,7 @@ use App\Models\Resource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class CommentController extends Controller
@@ -18,9 +19,10 @@ class CommentController extends Controller
      */
     public function index($id): JsonResponse
     {
-        $comments = Resource::find($id)->comments()->get();
-
-        return $this->sendResponse($comments, 'Comments retrieved successfully.');
+        return $this->sendResponse(
+            DB::table('resources')->find($id)->addSelect('comments')->paginate(10),
+            'Comments retrieved successfully.'
+        );
     }
 
     /**
@@ -55,7 +57,6 @@ class CommentController extends Controller
 
     /**
      * Update the specified resource in storage.
-
      */
     public function update(Request $request, $resource_id, $id): JsonResponse
     {
@@ -87,7 +88,7 @@ class CommentController extends Controller
             'content' => 'required|string|min:2|max:255',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Validation Error.', (array)$validator->errors());
         }
 

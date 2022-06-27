@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Resource;
+use Illuminate\Auth\TokenGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,17 @@ class ResourceController extends Controller
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(DB::table('resources')->paginate(10), 'Resources found successfully.');
+        if (!Auth::user()) {
+            return $this->sendResponse(DB::table('resources')
+                ->where('scope', '=', 'public')
+                ->paginate(10),
+                'Resources found successfully.');
+        }
+
+        return $this->sendResponse(DB::table('resources')
+            ->where('scope', '=', 'public')
+            ->paginate(10),
+            'Resources found successfully.');
     }
 
     /**
@@ -101,7 +112,7 @@ class ResourceController extends Controller
             'category_id' => 'required|integer',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Validation Error.', (array)$validator->errors());
         }
 
