@@ -28,15 +28,29 @@ class ResourceController extends Controller
                 $join->on('resources.user_id', '=', 'relations.first_user_id')
                     ->orOn('resources.user_id', '=', 'relations.second_user_id');
             })
+            ->join('users', 'resources.user_id', '=', 'users.id')
             ->where([['resources.status', '=', 'accepted'], ['resources.scope', '=', 'shared'], ['resources.deleted_at', null]])
-            ->select('resources.*', DB::raw('relations.first_user_id'), DB::raw('relations.second_user_id'));
+            ->select('resources.*',
+                'users.email',
+                'users.avatar',
+                'users.firstname',
+                'users.lastname',
+                DB::raw('relations.first_user_id'),
+                DB::raw('relations.second_user_id'));
 
         $public_resources = DB::table('resources')
+            ->join('users', 'resources.user_id', '=', 'users.id')
             ->where([['resources.status', '=', 'accepted'], ['resources.deleted_at', null]])
             ->where('resources.scope', '=', 'public')
             ->orWhere([['resources.scope', '=', 'private'], ['resources.user_id', Auth::user()->getAuthIdentifier()]])
             ->union($shared_resources)
-            ->select('resources.*', DB::raw('NULL as first_user_id'), DB::raw('NULL as second_user_id'))
+            ->select('resources.*',
+                'users.email',
+                'users.avatar',
+                'users.firstname',
+                'users.lastname',
+                DB::raw('NULL as first_user_id'),
+                DB::raw('NULL as second_user_id'))
             ->paginate(10);
 
         return $this->sendResponse($public_resources, 'Resources found successfully.');
