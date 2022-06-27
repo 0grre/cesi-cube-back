@@ -83,7 +83,6 @@ class RelationController extends Controller
         return $this->sendResponse([], 'Relation deleted successfully.');
     }
 
-
     /**
      * @param Request $request
      * @param $user_id
@@ -92,7 +91,6 @@ class RelationController extends Controller
      */
     public function RelationValidator(Request $request, $user_id, $id = null): JsonResponse|AnonymousResourceCollection
     {
-
         $relation = DB::table('relations')
             ->whereIn('first_user_id', [$user_id, $request->second_user_id])
             ->whereIn('second_user_id', [$user_id, $request->second_user_id])
@@ -103,17 +101,25 @@ class RelationController extends Controller
             'relation_type_id' => 'required',
         ]);
 
-        if($validator->fails() or (!$id && $relation) or ($user_id == $request->second_user_id)){
+        if($validator->fails() or (!$id && $relation)){
             return $this->sendError('Validation Error.',
                 $relation ? ['Relation with user '. $request->second_user_id .' exist'] : (array)$validator->errors());
         }
 
-        $relation = $id ? Relation::find($id) : new Relation();
-        $relation->first_user_id = $user_id;
-        $relation->second_user_id = $request->second_user_id;
-        $relation->relation_type_id = $request->relation_type_id;
-        $relation->save();
+        $relation_request = DB::table('relations')
+            ->whereIn('first_user_id', [$user_id, $request->second_user_id])
+            ->whereIn('second_user_id', [$user_id, $request->second_user_id])
+            ->exists();
 
-        return RelationResource::collection(Relation::where('id', $relation->id)->get());
+        if($relation_request and $relation_request->status = 'accepted' and $user_id != $request->second_user_id){
+            $relation = $id ? Relation::find($id) : new Relation();
+            $relation->first_user_id = $user_id;
+            $relation->second_user_id = $request->second_user_id;
+            $relation->relation_type_id = $request->relation_type_id;
+            $relation->save();
+            return RelationResource::collection(Relation::where('id', $relation->id)->get());
+        } else {
+            return $this->sendError("Relation Request doesn't exist or is not valid");
+        }
     }
 }

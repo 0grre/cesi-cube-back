@@ -15,9 +15,9 @@ class RelationSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
-        $relationType = [
+        $relation_types = [
             'conjoint(e)',
             'ami(e)',
             'famille',
@@ -25,7 +25,7 @@ class RelationSeeder extends Seeder
             'aucun',
         ];
 
-        foreach ($relationType as $relation_type) {
+        foreach ($relation_types as $relation_type) {
             $resourceType = new RelationType();
             $resourceType->name = $relation_type;
             $resourceType->save();
@@ -33,23 +33,20 @@ class RelationSeeder extends Seeder
 
         foreach (User::all() as $user) {
 
-            foreach (RelationType::all() as $relation_type) {
+            $relation_requests = DB::table('relation_requests')
+                ->where('first_user_id', 1)
+                ->orWhere('second_user_id', 1)
+                ->get();
 
-                for ($i = 0; $i <= 30; $i++) {
-                    $second_user = User::find(rand(1, 10));
+            foreach ($relation_requests as $relation_request) {
 
-                    $relation = DB::table('relations')
-                        ->whereIn('first_user_id', [$user->id, $second_user->id])
-                        ->whereIn('second_user_id', [$user->id, $second_user->id])
-                        ->exists();
-
-                    if (!$relation) {
-                        $relation = new Relation;
-                        $relation->first_user_id = $user->id;
-                        $relation->second_user_id = $second_user->id;
-                        $relation->relation_type_id = $relation_type->id;
-                        $relation->save();
-                    }
+                if ($relation_request->status = 'accepted') {
+                    $second_user = User::inRandomOrder()->limit(1)->first();
+                    $relation = new Relation;
+                    $relation->first_user_id = $user->id;
+                    $relation->second_user_id = $second_user->id;
+                    $relation->relation_type_id = RelationType::inRandomOrder()->limit(1)->first()->id;
+                    $relation->save();
                 }
             }
         }

@@ -5,9 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Collection;
 
-class Relation extends Model
+class RelationRequest extends Model
 {
     use HasFactory;
 
@@ -15,18 +14,10 @@ class Relation extends Model
      * @var string[]
      */
     protected $fillable = [
-        'relation_type_id',
+        'status',
         'first_user_id',
         'second_user_id',
     ];
-
-    /**
-     * @return BelongsTo
-     */
-    public function relation_type(): BelongsTo
-    {
-        return $this->belongsTo(RelationType::class);
-    }
 
     /**
      * @return BelongsTo

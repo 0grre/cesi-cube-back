@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -70,11 +71,20 @@ class User extends Authenticatable
     }
 
     /**
-     * @return HasMany
+     * @return Collection
      */
-    public function relations(): HasMany
+    public function relations(): Collection
     {
-        return $this->hasMany(Relation::class, 'first_user_id');
+        $relations = collect($this->hasMany(Relation::class, 'first_user_id')->get());
+        return $relations->merge(collect($this->hasMany(Relation::class, 'second_user_id')->get()));
     }
 
+    /**
+     * @return Collection
+     */
+    public function relation_requests(): Collection
+    {
+        $relations = collect($this->hasMany(RelationRequest::class, 'first_user_id')->get());
+        return $relations->merge(collect($this->hasMany(Relation::class, 'second_user_id')->get()));
+    }
 }
