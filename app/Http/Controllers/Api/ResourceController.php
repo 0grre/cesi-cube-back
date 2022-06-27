@@ -19,6 +19,8 @@ class ResourceController extends Controller
      */
     public function index(): JsonResponse
     {
+        //penser à mettre en public et faire condition en fonction du role
+
         $relations = DB::table('relations')
             ->where('first_user_id', '=', Auth::user()->getAuthIdentifier())
             ->orWhere('relations.second_user_id', '=', Auth::user()->getAuthIdentifier());
@@ -110,6 +112,9 @@ class ResourceController extends Controller
         if (is_null($resource)) {
             return $this->sendError('Resource not found.');
         }
+
+        $resource->disabled_at = date('Y-m-d H:i:s');
+        $resource->save();
 
         return $this->sendResponse([], 'Resource deleted successfully.');
     }
