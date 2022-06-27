@@ -103,7 +103,7 @@ class RelationController extends Controller
             'relation_type_id' => 'required',
         ]);
 
-        if($validator->fails() or (!$id && $relation)){
+        if($validator->fails() or (!$id && $relation) or ($user_id == $request->second_user_id)){
             return $this->sendError('Validation Error.',
                 $relation ? ['Relation with user '. $request->second_user_id .' exist'] : (array)$validator->errors());
         }

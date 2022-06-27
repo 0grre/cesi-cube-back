@@ -19,7 +19,27 @@ class ResourceController extends Controller
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(DB::table('resources')->paginate(10), 'Resources found successfully.');
+        $relations = DB::table('relations')
+            ->where('first_user_id', '=', Auth::user()->getAuthIdentifier())
+            ->orWhere('relations.second_user_id', '=', Auth::user()->getAuthIdentifier());
+
+        $shared_resources = DB::table('resources')
+            ->joinSub($relations, 'relations', function ($join) {
+                $join->on('resources.user_id', '=', 'relations.first_user_id')
+                    ->orOn('resources.user_id', '=', 'relations.second_user_id');
+            })
+            ->where([['resources.status', '=', 'accepted'], ['resources.scope', '=', 'shared'], ['resources.deleted_at', null]])
+            ->select('resources.*', DB::raw('relations.first_user_id'), DB::raw('relations.second_user_id'));
+
+        $public_resources = DB::table('resources')
+            ->where([['resources.status', '=', 'accepted'], ['resources.deleted_at', null]])
+            ->where('resources.scope', '=', 'public')
+            ->orWhere([['resources.scope', '=', 'private'], ['resources.user_id', Auth::user()->getAuthIdentifier()]])
+            ->union($shared_resources)
+            ->select('resources.*', DB::raw('NULL as first_user_id'), DB::raw('NULL as second_user_id'))
+            ->paginate(10);
+
+        return $this->sendResponse($public_resources, 'Resources found successfully.');
     }
 
     /**
@@ -101,7 +121,7 @@ class ResourceController extends Controller
             'category_id' => 'required|integer',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Validation Error.', (array)$validator->errors());
         }
 
