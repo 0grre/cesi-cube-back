@@ -69,7 +69,7 @@ class UserController extends Controller
 
         $user->email = $request->email ?? $user->email;
         $user->password = $request->password ? Hash::make($request->password) : $user->password;
-        $user->avatar = $request->avatar ? Storage::url(Storage::disk('public')->putFile('avatars', $file)) : $user->avatar;
+        $user->avatar = $request->avatar ? Storage::url(Storage::disk('public')->putFile('avatars', $file)) : null;
         $user->firstname = $request->firstname ?? $user->firstname;
         $user->lastname = $request->lastname ?? $user->lastname;
         $user->address1 = $request->address1 ?? $user->address1;
@@ -78,7 +78,6 @@ class UserController extends Controller
         $user->city = $request->city ?? $user->city;
         $user->primaryPhone = $request->primaryPhone ?? $user->primaryPhone;
         $user->secondaryPhone = $request->secondaryPhone ?? $user->secondaryPhone;
-        $user->birthDate = $request->birthDate ?? $user->birthDate;
         $user->save();
 
         return $this->sendResponse(UserResource::make($user), 'User updated successfully.');
