@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
+        //à voir paginator et resource
         return $this->sendResponse(DB::table('users')->paginate(10), 'Users found successfully.');
     }
 
@@ -79,7 +81,7 @@ class UserController extends Controller
         $user->birthDate = $request->birthDate ?? $user->birthDate;
         $user->save();
 
-        return $this->sendResponse($user, 'User updated successfully.');
+        return $this->sendResponse(UserResource::make($user), 'User updated successfully.');
     }
 
     /**
@@ -98,7 +100,7 @@ class UserController extends Controller
         $user->disabled_at = date('Y-m-d H:i:s');
         $user->save();
 
-        return $this->sendResponse($user, 'User disabled successfully.');
+        return $this->sendResponse(UserResource::make($user), 'User disabled successfully.');
     }
 
     /**

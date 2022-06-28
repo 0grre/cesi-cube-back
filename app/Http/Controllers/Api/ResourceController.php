@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Resource;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,43 +19,59 @@ class ResourceController extends Controller
      */
     public function index(): JsonResponse
     {
-        //penser à mettre en public et faire condition en fonction du role
+        if (Auth::user()) {
+            if (Auth::user()->hasRole(['citizen', 'moderator'])) {
+                $user_resources = DB::table('resources')
+                    ->join('users', 'resources.user_id', '=', 'users.id')
+                    ->where([['resources.status', '=', 'accepted'], ['resources.deleted_at', null]])
+                    ->where('resources.scope', '=', 'public')
+                    ->orWhere([['resources.scope', '=', 'private'], ['resources.user_id', Auth::user()->getAuthIdentifier()]])
+                    ->select('resources.*',
+                        'users.email',
+                        'users.avatar',
+                        'users.firstname',
+                        'users.lastname',
+                        DB::raw('NULL as first_user_id'),
+                        DB::raw('NULL as second_user_id'));
 
-        $relations = DB::table('relations')
-            ->where('first_user_id', '=', Auth::user()->getAuthIdentifier())
-            ->orWhere('relations.second_user_id', '=', Auth::user()->getAuthIdentifier());
+                $relations = DB::table('relations')
+                    ->where('first_user_id', '=', Auth::user()->getAuthIdentifier())
+                    ->orWhere('relations.second_user_id', '=', Auth::user()->getAuthIdentifier());
 
-        $shared_resources = DB::table('resources')
-            ->joinSub($relations, 'relations', function ($join) {
-                $join->on('resources.user_id', '=', 'relations.first_user_id')
-                    ->orOn('resources.user_id', '=', 'relations.second_user_id');
-            })
-            ->join('users', 'resources.user_id', '=', 'users.id')
-            ->where([['resources.status', '=', 'accepted'], ['resources.scope', '=', 'shared'], ['resources.deleted_at', null]])
-            ->select('resources.*',
-                'users.email',
-                'users.avatar',
-                'users.firstname',
-                'users.lastname',
-                DB::raw('relations.first_user_id'),
-                DB::raw('relations.second_user_id'));
+                $shared_resources = DB::table('resources')
+                    ->joinSub($relations, 'relations', function ($join) {
+                        $join->on('resources.user_id', '=', 'relations.first_user_id')
+                            ->orOn('resources.user_id', '=', 'relations.second_user_id');
+                    })
+                    ->join('users', 'resources.user_id', '=', 'users.id')
+                    ->where([['resources.status', '=', 'accepted'], ['resources.scope', '=', 'shared'], ['resources.deleted_at', null]])
+                    ->union($user_resources)
+                    ->select('resources.*',
+                        'users.email',
+                        'users.avatar',
+                        'users.firstname',
+                        'users.lastname',
+                        DB::raw('relations.first_user_id'),
+                        DB::raw('relations.second_user_id'));
 
-        $public_resources = DB::table('resources')
-            ->join('users', 'resources.user_id', '=', 'users.id')
-            ->where([['resources.status', '=', 'accepted'], ['resources.deleted_at', null]])
-            ->where('resources.scope', '=', 'public')
-            ->orWhere([['resources.scope', '=', 'private'], ['resources.user_id', Auth::user()->getAuthIdentifier()]])
-            ->union($shared_resources)
-            ->select('resources.*',
-                'users.email',
-                'users.avatar',
-                'users.firstname',
-                'users.lastname',
-                DB::raw('NULL as first_user_id'),
-                DB::raw('NULL as second_user_id'))
-            ->paginate(10);
+                $resources = $shared_resources;
+            } else if (Auth::user()->hasRole(['super-admin', 'admin'])) {
+                $resources = DB::table('resources');
+            }
+        } else {
+            $resources = DB::table('resources')
+                ->join('users', 'resources.user_id', '=', 'users.id')
+                ->where([['resources.status', '=', 'accepted'], ['resources.deleted_at', null]])
+                ->where('resources.scope', '=', 'public')
+                ->select('resources.*',
+                    'users.email',
+                    'users.avatar',
+                    'users.firstname',
+                    'users.lastname'
+                );
+        }
 
-        return $this->sendResponse($public_resources, 'Resources found successfully.');
+        return $this->sendResponse($resources->paginate(10), 'Resources found successfully.');
     }
 
     /**
@@ -98,7 +113,17 @@ class ResourceController extends Controller
      */
     public function update(Request $request, $id): JsonResponse
     {
-        return $this->sendResponse($this->ResourceValidator($request, $id), 'Resource updated successfully.');
+        $resource = Resource::find($id);
+
+        if (is_null($resource)) {
+            return $this->sendError('Resource not found.');
+        }
+
+        if (self::check_owner($resource)) {
+            return $this->sendResponse($this->ResourceValidator($request, $id), 'Resource updated successfully.');
+        } else {
+            return $this->sendError('Validation Error.', (array)'this resource does not belong to you');
+        }
     }
 
     /**
@@ -114,30 +139,31 @@ class ResourceController extends Controller
             return $this->sendError('Resource not found.');
         }
 
-        $resource->disabled_at = date('Y-m-d H:i:s');
-        $resource->save();
+        if (self::check_owner($resource)) {
 
-        return $this->sendResponse([], 'Resource deleted successfully.');
+            $resource->disabled_at = date('Y-m-d H:i:s');
+            $resource->save();
+
+            return $this->sendResponse([], 'Resource deleted successfully.');
+        } else {
+            return $this->sendError('Validation Error.', (array)'this resource does not belong to you');
+        }
     }
 
     /**
-     * @param $user_id
-     * @param $id
-     * @return JsonResponse
+     * @param $resource
+     * @return bool
      */
-    public function add_to_read_later($user_id, $id): JsonResponse
+    public function check_owner($resource): bool
     {
-        $user = User::find($user_id);
-        $resource = Resource::find($id);
-
-        if (!$user->read_later()->where('resource_id', $resource->id)->exists())
-        {
-            $user->read_later()->attach($resource);
-
-            return $this->sendResponse($user->read_later()->get(), 'Resource add to read later list successfully.');
+        if (Auth::user()->hasRole(['citizen', 'moderator'])) {
+            if ($resource->user_id != Auth::user()->getAuthIdentifier()) {
+                return false;
+            } else {
+                return true;
+            }
         } else {
-
-            return $this->sendError('Validation Error.', (array)'Resource read later exist');
+            return true;
         }
     }
 
@@ -166,9 +192,11 @@ class ResourceController extends Controller
             return $this->sendError('Validation Error.', (array)$validator->errors());
         }
 
-        $decoded = base64_decode($request->mediaUrl);
-        $file = '/media';
-        file_put_contents($file, $decoded);
+        if ($request->mediaUrl) {
+            $decoded = base64_decode($request->mediaUrl);
+            $file = '/media';
+            file_put_contents($file, $decoded);
+        }
 
         $resource = $id ? Resource::find($id) : new Resource();
 
@@ -182,7 +210,7 @@ class ResourceController extends Controller
         $resource->scope = $request->scope ?? $resource->scope;
         $resource->type_id = $request->type_id ?? $resource->type_id;
         $resource->category_id = $request->category_id ?? $resource->category_id;
-        $resource->user_id = Auth::user()?->getAuthIdentifier();
+        $resource->user_id = $id ? $resource->user_id : Auth::user()?->getAuthIdentifier();
 
         $resource->save();
 

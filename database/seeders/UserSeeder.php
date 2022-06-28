@@ -116,6 +116,24 @@ class UserSeeder extends Seeder
             $user->city = $city[$i];
             $user->primaryPhone = $phone[$i];
             $user->save();
+
+            $user->assignRole('citizen');
+        }
+
+        $roles = [
+            'super-admin',
+            'admin',
+            'moderator',
+        ];
+
+        foreach($roles as $role){
+            $user = new User();
+            $user->email = $role.'@cesi.fr';
+            $user->password = Hash::make($role);
+            $user->firstname = $role;
+            $user->save();
+
+            $user->assignRole($role);
         }
     }
 }

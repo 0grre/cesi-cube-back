@@ -11,20 +11,39 @@ use App\Http\Controllers\Api\ResourceController;
 use App\Http\Controllers\Api\TypeController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Models\Resource;
+use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Spatie\Permission\Models\Role;
 
 /*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
 */
+
+/*
+| Not connected citizen
+*/
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [RegisterController::class, 'login']);
 Route::get('/login', [RegisterController::class, 'login_failed'])->name('login');
 
+Route::get('/resources', [ResourceController::class, 'index']);
+Route::get('/resources/{id}', [ResourceController::class, 'show']);
+
 Route::middleware('auth:sanctum')->group(function () {
+
+    // à voir avec l'historie du guard
+    Route::get('/resources', [ResourceController::class, 'index']);
+    Route::get('/resources/{id}', [ResourceController::class, 'show']);
+
+    Route::group(['middleware' => ['role:super-admin|admin|moderator|citizen']], function () {
+        Route::post('/resources', [ResourceController::class, 'store']);
+        Route::put('/resources/{id}', [ResourceController::class, 'update']);
+        Route::delete('/resources/{id}', [ResourceController::class, 'destroy']);
+    });
 
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/{id}', [UserController::class, 'show']);
@@ -68,12 +87,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/categories', [CategoryController::class, 'store']);
     Route::put('/categories/{id}', [CategoryController::class, 'update']);
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
-
-    Route::get('/resources', [ResourceController::class, 'index']);
-    Route::get('/resources/{id}', [ResourceController::class, 'show']);
-    Route::post('/resources', [ResourceController::class, 'store']);
-    Route::put('/resources/{id}', [ResourceController::class, 'update']);
-    Route::delete('/resources/{id}', [ResourceController::class, 'destroy']);
 
     Route::get('/resources/{resource}/comments', [CommentController::class, 'index']);
     Route::post('/resources/{resource}/comments', [CommentController::class, 'store']);
