@@ -42,6 +42,7 @@ class RegisterController extends Controller
         $input = $request->all();
         $input['password'] = Hash::make($input['password']);
         $user = User::create($input);
+        $user->assignRole('citizen');
         $success['token'] = $user->createToken('CesiCube')->plainTextToken;
         $success['user'] = UserResource::make($user);
 
