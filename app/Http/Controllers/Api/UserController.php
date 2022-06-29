@@ -9,7 +9,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -32,6 +31,33 @@ class UserController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $this->UserValidator($request);
+        $validator = Validator::make($request->all(), [
+            'email' => 'email|unique:users|required',
+            'password' => 'string|min:4|required',
+            'role' => 'string|required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', (array)$validator->errors());
+        }
+        $user = new User();
+
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
+        $user->firstname = $request->firstname ?? '';
+        $user->lastname = $request->lastname ?? '';
+        $user->address1 = $request->address1 ?? '';
+        $user->address2 = $request->address2 ?? '';
+        $user->zipCode = $request->zipCode ?? '';
+        $user->city = $request->city ?? '';
+        $user->birthDate = $request->birthDate ?? '';
+        $user->primaryPhone = $request->primaryPhone ?? '';
+        $user->secondaryPhone = $request->secondaryPhone ?? '';
+        $user->save();
+
+        $user->assignRole($request->role);
+
         return $this->sendResponse($this->UserValidator($request), 'User created successfully.');
     }
 
@@ -62,7 +88,7 @@ class UserController extends Controller
     public function update(Request $request, $id): JsonResponse
     {
         $this->UserValidator($request);
-        $user = $id ? User::find($id) : new User();
+        $user = User::find($id);
 
         if (is_null($user)) {
             return $this->sendError('User not found.');

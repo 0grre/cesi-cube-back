@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ResourceResource;
 use App\Models\Resource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +18,7 @@ class ReadLaterController extends Controller
     {
         $user = User::find($user_id);
 
-        return $this->sendResponse($user->read_later()->get(), 'Read later resource list retrieved successfully.');
+        return $this->sendResponse(ResourceResource::collection($user->read_later()->get()), 'Read later resource list retrieved successfully.');
     }
 
     /**
@@ -36,7 +37,7 @@ class ReadLaterController extends Controller
         {
             $user->read_later()->attach($resource);
 
-            return $this->sendResponse($user->read_later()->get(), 'Resource add to read later list successfully.');
+            return $this->sendResponse(ResourceResource::collection($user->read_later()->get()), 'Resource add to read later list successfully.');
         } else {
 
             return $this->sendError('Validation Error.', (array)'Resource read_later exist');

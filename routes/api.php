@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\ExploitedController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\ReadLaterController;
 use App\Http\Controllers\Api\RelationController;
@@ -80,6 +81,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/users/{user}/read_later/{resource}', [ReadLaterController::class, 'store']);
         Route::delete('/users/{user}/read_later/{resource}', [ReadLaterController::class, 'destroy']);
 
+        /* --- Exploited Resources --- */
+        Route::get('/users/{user}/exploited', [ExploitedController::class, 'index']);
+        Route::post('/users/{user}/exploited/{resource}', [ExploitedController::class, 'store']);
+        Route::delete('/users/{user}/exploited/{resource}', [ExploitedController::class, 'destroy']);
+
         /* --- Resource Comments --- */
         Route::get('/resources/{resource}/comments', [CommentController::class, 'index']);
         Route::post('/resources/{resource}/comments', [CommentController::class, 'store']);
@@ -94,11 +100,6 @@ Route::middleware('auth:sanctum')->group(function () {
         /* --- Categories --- */
         Route::get('/categories', [CategoryController::class, 'index']);
         Route::get('/categories/{id}', [CategoryController::class, 'show']);
-    });
-
-    Route::group(['middleware' => ['role:super-admin|admin|moderator']], function () {
-
-
     });
 
     Route::group(['middleware' => ['role:super-admin|admin']], function () {
@@ -125,7 +126,4 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/test', function () {
 
-    $r = Resource::all()->first();
-
-    return $r->category;
 });
