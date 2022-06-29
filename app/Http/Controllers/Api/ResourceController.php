@@ -172,6 +172,8 @@ class ResourceController extends Controller
      */
     public function ResourceValidator(Request $request, $id = null): JsonResponse|ResourceResource
     {
+        $resource = $id ? Resource::find($id) : new Resource();
+
         $validator = Validator::make($request->all(), [
             'title' => 'required | string',
             'views' => 'integer',
@@ -191,14 +193,14 @@ class ResourceController extends Controller
             $decoded = base64_decode($request->mediaUrl);
             $file = 'media';
             file_put_contents($file, $decoded);
+            $resource->mediaUrl = Storage::url(Storage::disk('public')->putFile('medias', $file));
+        } else {
+            $resource->mediaUrl = $request->mediaUrl ?? null;
         }
-
-        $resource = $id ? Resource::find($id) : new Resource();
 
         $resource->title = $request->title ?? $resource->title;
         $resource->views = $request->views ?? $resource->views;
         $resource->richTextContent = $request->richTextContent ?? $resource->richTextContent;
-        $resource->mediaUrl = $request->mediaUrl ? Storage::url(Storage::disk('public')->putFile('medias', $file)) : $resource->mediaUrl;
         $resource->status = $request->status ?? $resource->status;
         $resource->scope = $request->scope ?? $resource->scope;
         $resource->type_id = $request->type_id ?? $resource->type_id;
