@@ -187,11 +187,9 @@ class ResourceController extends Controller
             return $this->sendError('Validation Error . ', (array)$validator->errors());
         }
 
-        if ($request->mediaUrl) {
-            $decoded = base64_decode($request->mediaUrl);
-            $file = ' / media';
-            file_put_contents($file, $decoded);
-        }
+        $decoded = base64_decode($request->mediaUrl);
+        $file = 'media';
+        file_put_contents($file, $decoded);
 
         $resource = $id ? Resource::find($id) : new Resource();
 

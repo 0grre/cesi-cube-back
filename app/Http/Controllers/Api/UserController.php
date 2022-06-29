@@ -98,8 +98,9 @@ class UserController extends Controller
             return $this->sendError('Validation Error.', (array)'you don\'t have the right to modify this user');
         }
 
+
         $decoded = base64_decode($request->avatar);
-        $file = '/avatar';
+        $file = 'avatar';
         file_put_contents($file, $decoded);
 
         $user->avatar = $request->avatar ? Storage::url(Storage::disk('public')->putFile('avatars', $file)) : null;
