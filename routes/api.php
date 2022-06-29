@@ -17,6 +17,7 @@ use App\Models\Resource;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 
 /*
