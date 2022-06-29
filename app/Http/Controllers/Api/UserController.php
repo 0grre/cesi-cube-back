@@ -102,10 +102,12 @@ class UserController extends Controller
             $decoded = base64_decode($request->avatar);
             $file = 'avatar';
             file_put_contents($file, $decoded);
+            $user->avatar = Storage::url(Storage::disk('public')->putFile('avatars', $file));
+        } else {
+            $user->avatar = $request->avatar ?? null;
         }
 
         $user->email = $request->email ?? $user->email;
-        $user->avatar = $request->avatar ? Storage::url(Storage::disk('public')->putFile('avatars', $file)) : null;
         $user->firstname = $request->firstname ?? $user->firstname;
         $user->lastname = $request->lastname ?? $user->lastname;
         $user->address1 = $request->address1 ?? $user->address1;
