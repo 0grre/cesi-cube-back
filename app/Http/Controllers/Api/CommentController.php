@@ -44,7 +44,6 @@ class CommentController extends Controller
      */
     public function show($id): JsonResponse
     {
-
         $comment = Comment::find($id);
 
         if (is_null($comment)) {
@@ -70,9 +69,37 @@ class CommentController extends Controller
      */
     public function destroy($id): JsonResponse
     {
-        Comment::find($id)->delete();
+        $comment = Comment::find($id);
 
-        return $this->sendResponse([], 'Comment deleted successfully.');
+        if (is_null($comment)) {
+            return $this->sendError('Comment not found.');
+        }
+
+        if (self::check_owner($comment)) {
+
+            $comment->delete();
+
+            return $this->sendResponse([], 'Comment deleted successfully.');
+        } else {
+            return $this->sendError('Validation Error.', (array)'this comment does not belong to you');
+        }
+    }
+
+    /**
+     * @param $comment
+     * @return bool
+     */
+    public function check_owner($comment): bool
+    {
+        if (Auth::user()->hasRole('citizen')) {
+            if ($comment->user_id != Auth::user()->getAuthIdentifier()) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
     }
 
     /**

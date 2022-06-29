@@ -31,12 +31,10 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [RegisterController::class, 'login']);
 Route::get('/login', [RegisterController::class, 'login_failed'])->name('login');
 
-Route::get('/resources', [ResourceController::class, 'index']);
-Route::get('/resources/{id}', [ResourceController::class, 'show']);
+//Route::get('/resources', [ResourceController::class, 'index']);
+//Route::get('/resources/{id}', [ResourceController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
-
-    // à voir avec l'historie du guard
 
     /* --- Resources --- */
     Route::get('/resources', [ResourceController::class, 'index']);
@@ -127,13 +125,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/test', function () {
 
-    for ($i = 0; $i <= 25; $i++) {
-        $user = User::inRandomOrder()->limit(1)->first();
-        $resource = Resource::inRandomOrder()->limit(1)->first();
+    $r = Resource::all()->first();
 
-        if (!$user->exploited()->where('resource_id', $resource->id)->exists())
-        {
-            $user->exploited()->attach($resource);
-        }
-    }
+    return $r->category;
 });

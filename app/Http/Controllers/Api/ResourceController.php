@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ResourceResource;
 use App\Models\Resource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,53 +26,40 @@ class ResourceController extends Controller
                     ->join('users', 'resources.user_id', '=', 'users.id')
                     ->where([['resources.status', '=', 'accepted'], ['resources.deleted_at', null]])
                     ->where('resources.scope', '=', 'public')
-                    ->orWhere([['resources.scope', '=', 'private'], ['resources.user_id', Auth::user()->getAuthIdentifier()]])
-                    ->select('resources.*',
-                        'users.email',
-                        'users.avatar',
-                        'users.firstname',
-                        'users.lastname',
-                        DB::raw('NULL as first_user_id'),
-                        DB::raw('NULL as second_user_id'));
+                    ->orWhere('resources.user_id', Auth::user()->getAuthIdentifier())
+                    ->select('resources.*');
 
                 $relations = DB::table('relations')
                     ->where('first_user_id', '=', Auth::user()->getAuthIdentifier())
                     ->orWhere('relations.second_user_id', '=', Auth::user()->getAuthIdentifier());
 
-                $shared_resources = DB::table('resources')
-                    ->joinSub($relations, 'relations', function ($join) {
+                $shared_resources = Resource::joinSub($relations, 'relations', function ($join) {
                         $join->on('resources.user_id', '=', 'relations.first_user_id')
                             ->orOn('resources.user_id', '=', 'relations.second_user_id');
                     })
                     ->join('users', 'resources.user_id', '=', 'users.id')
                     ->where([['resources.status', '=', 'accepted'], ['resources.scope', '=', 'shared'], ['resources.deleted_at', null]])
                     ->union($user_resources)
-                    ->select('resources.*',
-                        'users.email',
-                        'users.avatar',
-                        'users.firstname',
-                        'users.lastname',
-                        DB::raw('relations.first_user_id'),
-                        DB::raw('relations.second_user_id'));
+                    ->select('resources.*')
+                    ->get();
 
                 $resources = $shared_resources;
+
             } else if (Auth::user()->hasRole(['super-admin', 'admin'])) {
-                $resources = DB::table('resources');
+                $resources = DB::table('resources')
+                    ->select('resources.*')
+                    ->get();
             }
         } else {
             $resources = DB::table('resources')
                 ->join('users', 'resources.user_id', '=', 'users.id')
                 ->where([['resources.status', '=', 'accepted'], ['resources.deleted_at', null]])
                 ->where('resources.scope', '=', 'public')
-                ->select('resources.*',
-                    'users.email',
-                    'users.avatar',
-                    'users.firstname',
-                    'users.lastname'
-                );
+                ->select('resources.*')
+                ->get();
         }
 
-        return $this->sendResponse($resources->paginate(10), 'Resources found successfully.');
+        return $this->sendResponse(ResourceResource::collection(collect($resources)), 'Resources found successfully.');
     }
 
     /**
@@ -79,7 +67,6 @@ class ResourceController extends Controller
      *
      * @param Request $request
      * @return JsonResponse
-     * @throws ValidationException
      */
     public function store(Request $request): JsonResponse
     {
@@ -96,11 +83,16 @@ class ResourceController extends Controller
     {
         $resource = Resource::find($id);
 
+        if (!self::check_owner($resource) && $resource->scope == 'private')
+        {
+             return $this->sendError('Resource is private.');
+        }
+
         if (is_null($resource)) {
             return $this->sendError('Resource not found.');
         }
 
-        return $this->sendResponse($resource, 'Resource found successfully.');
+        return $this->sendResponse(ResourceResource::make($resource), 'Resource found successfully.');
     }
 
     /**
@@ -170,10 +162,9 @@ class ResourceController extends Controller
     /**
      * @param Request $request
      * @param null $id
-     * @return Resource|JsonResponse
-     * @throws ValidationException
+     * @return JsonResponse|ResourceResource
      */
-    public function ResourceValidator(Request $request, $id = null): Resource|JsonResponse
+    public function ResourceValidator(Request $request, $id = null): JsonResponse|ResourceResource
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string',
@@ -210,6 +201,6 @@ class ResourceController extends Controller
 
         $resource->save();
 
-        return $resource;
+        return ResourceResource::make($resource);
     }
 }

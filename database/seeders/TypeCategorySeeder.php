@@ -35,7 +35,7 @@ class TypeCategorySeeder extends Seeder
             'Activité / Jeu à réaliser Article',
             'Carte défi',
             'Cours au format PDF Exercice / Atelier Fiche de lecture',
-            'Jeu en ligne Vidéo'
+            'Jeu Vidéo en ligne'
         ];
 
         foreach($categories as $category){

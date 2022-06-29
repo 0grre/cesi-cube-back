@@ -24,10 +24,10 @@ class UserResource extends JsonResource
             'primaryPhone' => $this->primaryPhone,
             'secondaryPhone' => $this->secondaryPhone,
             'birthDate' => $this->birthDate,
-            'roles' => RoleResource::collection($this->roles),
             'createdAt' => $this->created_at->format('d/m/Y'),
             'updatedAt' => $this->updated_at->format('d/m/Y'),
             'disableAt' => $this->disable_at ? $this->disable_at->format('d/m/Y') : $this->disable_at,
+            'roles' => RoleResource::collection($this->roles),
         ];
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -62,6 +63,14 @@ class UserController extends Controller
         $this->UserValidator($request);
         $user = $id ? User::find($id) : new User();
 
+        if (is_null($user)) {
+            return $this->sendError('User not found.');
+        }
+
+        if (!self::check_owner($user)) {
+            return $this->sendError('Validation Error.', (array)'you don\'t have the right to modify this user');
+        }
+
         $decoded = base64_decode($request->avatar);
         $file = '/avatar';
         file_put_contents($file, $decoded);
@@ -99,6 +108,23 @@ class UserController extends Controller
         $user->save();
 
         return $this->sendResponse(UserResource::make($user), 'User disabled successfully.');
+    }
+
+    /**
+     * @param $user
+     * @return bool
+     */
+    public function check_owner($user): bool
+    {
+        if (Auth::user()->hasRole(['citizen', 'moderator'])) {
+            if ($user->id != Auth::user()->getAuthIdentifier()) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
     }
 
     /**
