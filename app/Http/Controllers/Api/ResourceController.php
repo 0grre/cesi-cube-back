@@ -35,11 +35,14 @@ class ResourceController extends Controller
                     ->orWhere('relations.second_user_id', '=', Auth::user()->getAuthIdentifier());
 
                 $shared_resources = Resource::joinSub($relations, 'relations', function ($join) {
-                        $join->on('resources.user_id', '=', 'relations.first_user_id')
-                            ->orOn('resources.user_id', '=', 'relations.second_user_id');
-                    })
+                    $join->on('resources.user_id', '=', 'relations.first_user_id')
+                        ->orOn('resources.user_id', '=', 'relations.second_user_id');
+                })
                     ->join('users', 'resources.user_id', '=', 'users.id')
-                    ->where([['resources.status', '=', 'accepted'], ['resources.scope', '=', 'shared'], ['resources.deleted_at', null]])
+                    ->where([
+                        ['resources.status', '=', 'accepted'],
+                        ['resources.scope', '=', 'shared'],
+                        ['resources.deleted_at', null]])
                     ->union($user_resources)
                     ->select('resources.*')
                     ->get();
@@ -52,15 +55,14 @@ class ResourceController extends Controller
                     ->get();
             }
         } else {
-            $resources = DB::table('resources')
-                ->join('users', 'resources.user_id', '=', 'users.id')
-                ->where([['resources.status', '=', 'accepted'], ['resources.deleted_at', null]])
-                ->where('resources.scope', '=', 'public')
-                ->select('resources.*')
-                ->get();
+            $resources = Resource::where([
+                ['resources.status', '=', 'accepted'],
+                ['resources.scope', '=', 'public'],
+                ['resources.deleted_at', null]
+            ])->get();
         }
 
-        return $this->sendResponse(New Paginator(ResourceResource::collection(collect($resources)), 10), 'Resources found successfully.');
+        return $this->sendResponse(new Paginator(ResourceResource::collection(collect($resources)), 10), 'Resources found successfully.');
     }
 
     /**
@@ -84,16 +86,19 @@ class ResourceController extends Controller
     {
         $resource = Resource::find($id);
 
-        if (!self::check_owner($resource) && $resource->scope == 'private')
-        {
-             return $this->sendError('Resource is private.');
-        }
-
         if (is_null($resource)) {
             return $this->sendError('Resource not found.');
         }
 
-        return $this->sendResponse(ResourceResource::make($resource), 'Resource found successfully.');
+        if (Auth::user()) {
+            if (!self::check_owner($resource) && $resource->scope == 'private') {
+                return $this->sendError('Resource is private.');
+            }
+        } else if ($resource->scope != 'public') {
+            return $this->sendError('Resource is not accessible');
+        }
+
+        return $this->sendResponse(ResourceResource::make($resource), 'Resource found successfully . ');
     }
 
     /**
@@ -109,13 +114,13 @@ class ResourceController extends Controller
         $resource = Resource::find($id);
 
         if (is_null($resource)) {
-            return $this->sendError('Resource not found.');
+            return $this->sendError('Resource not found . ');
         }
 
         if (self::check_owner($resource)) {
-            return $this->sendResponse($this->ResourceValidator($request, $id), 'Resource updated successfully.');
+            return $this->sendResponse($this->ResourceValidator($request, $id), 'Resource updated successfully . ');
         } else {
-            return $this->sendError('Validation Error.', (array)'this resource does not belong to you');
+            return $this->sendError('Validation Error . ', (array)'this resource does not belong to you');
         }
     }
 
@@ -129,17 +134,17 @@ class ResourceController extends Controller
         $resource = Resource::find($id);
 
         if (is_null($resource)) {
-            return $this->sendError('Resource not found.');
+            return $this->sendError('Resource not found . ');
         }
 
         if (self::check_owner($resource)) {
 
-            $resource->disabled_at = date('Y-m-d H:i:s');
+            $resource->disabled_at = date('Y - m - d H:i:s');
             $resource->save();
 
-            return $this->sendResponse([], 'Resource deleted successfully.');
+            return $this->sendResponse([], 'Resource deleted successfully . ');
         } else {
-            return $this->sendError('Validation Error.', (array)'this resource does not belong to you');
+            return $this->sendError('Validation Error . ', (array)'this resource does not belong to you');
         }
     }
 
@@ -168,23 +173,23 @@ class ResourceController extends Controller
     public function ResourceValidator(Request $request, $id = null): JsonResponse|ResourceResource
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string',
+            'title' => 'required | string',
             'views' => 'integer',
             'richTextContent' => 'string',
             'mediaUrl' => 'max:10000',
-            'status' => 'string|min:2|max:55',
-            'scope' => 'string|min:2|max:55',
-            'type_id' => 'required|integer',
-            'category_id' => 'required|integer',
+            'status' => 'string | min:2 | max:55',
+            'scope' => 'string | min:2 | max:55',
+            'type_id' => 'required | integer',
+            'category_id' => 'required | integer',
         ]);
 
         if ($validator->fails()) {
-            return $this->sendError('Validation Error.', (array)$validator->errors());
+            return $this->sendError('Validation Error . ', (array)$validator->errors());
         }
 
         if ($request->mediaUrl) {
             $decoded = base64_decode($request->mediaUrl);
-            $file = '/media';
+            $file = ' / media';
             file_put_contents($file, $decoded);
         }
 

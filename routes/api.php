@@ -32,8 +32,8 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [RegisterController::class, 'login']);
 Route::get('/login', [RegisterController::class, 'login_failed'])->name('login');
 
-//Route::get('/resources', [ResourceController::class, 'index']);
-//Route::get('/resources/{id}', [ResourceController::class, 'show']);
+Route::get('/public/resources', [ResourceController::class, 'index']);
+Route::get('/public/resources/{id}', [ResourceController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -103,7 +103,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::group(['middleware' => ['role:super-admin|admin']], function () {
-
         /* --- Users --- */
         Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
@@ -121,6 +120,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/categories', [CategoryController::class, 'store']);
         Route::put('/categories/{id}', [CategoryController::class, 'update']);
         Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+    });
+
+    Route::group(['middleware' => ['role:super-admin|admin']], function () {
+        /* --- Users --- */
+        Route::post('/users', [UserController::class, 'store']);
     });
 });
 
