@@ -22,8 +22,8 @@ class ResourceResource extends JsonResource
             'mediaUrl' => $this->mediaUrl,
             'status' => $this->status,
             'scope' => $this->scope,
-            'createdAt' => $this->created_at->format('d/m/Y'),
-            'updatedAt' => $this->updated_at->format('d/m/Y'),
+            'createdAt' => $this->created_at,
+            'updatedAt' => $this->updated_at,
             'author' => UserResource::make($this->user),
             'comments' => CommentResource::collection($this->comments),
         ];

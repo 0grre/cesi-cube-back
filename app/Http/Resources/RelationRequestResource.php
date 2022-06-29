@@ -17,8 +17,8 @@ class RelationRequestResource extends JsonResource
             'status' => $this->status,
             'firstUser' => UserResource::make($this->first_user),
             'secondUser' => UserResource::make($this->second_user),
-            'createdAt' => $this->created_at->format('d/m/Y'),
-            'updatedAt' => $this->updated_at->format('d/m/Y'),
+            'createdAt' => $this->created_at,
+            'updatedAt' => $this->updated_at,
         ];
     }
 }
