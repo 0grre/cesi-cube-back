@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -20,7 +21,7 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(UserResource::collection(User::all()), 'Users found successfully.');
+        return $this->sendResponse(New Paginator(UserResource::collection(User::all()), 10), 'Users found successfully.');
     }
 
     /**

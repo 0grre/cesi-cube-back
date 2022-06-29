@@ -7,6 +7,7 @@ use App\Http\Resources\ResourceResource;
 use App\Models\Resource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -59,7 +60,7 @@ class ResourceController extends Controller
                 ->get();
         }
 
-        return $this->sendResponse(ResourceResource::collection(collect($resources)), 'Resources found successfully.');
+        return $this->sendResponse(New Paginator(ResourceResource::collection(collect($resources)), 10), 'Resources found successfully.');
     }
 
     /**
