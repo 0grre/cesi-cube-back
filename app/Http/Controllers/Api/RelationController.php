@@ -50,7 +50,7 @@ class RelationController extends Controller
             return $this->sendError('Relation not found.');
         }
 
-        return $this->sendResponse(RelationResource::collection($relation), 'Relation found successfully.');
+        return $this->sendResponse(RelationResource::make($relation), 'Relation found successfully.');
     }
 
     /**
@@ -86,10 +86,10 @@ class RelationController extends Controller
     /**
      * @param Request $request
      * @param $user_id
-     * @param $id
-     * @return JsonResponse|AnonymousResourceCollection
+     * @param null $id
+     * @return RelationResource|JsonResponse
      */
-    public function RelationValidator(Request $request, $user_id, $id = null): JsonResponse|AnonymousResourceCollection
+    public function RelationValidator(Request $request, $user_id, $id = null): RelationResource|JsonResponse
     {
         $relation = DB::table('relations')
             ->whereIn('first_user_id', [$user_id, $request->second_user_id])
@@ -117,7 +117,7 @@ class RelationController extends Controller
             $relation->second_user_id = $request->second_user_id;
             $relation->relation_type_id = $request->relation_type_id;
             $relation->save();
-            return RelationResource::collection(Relation::where('id', $relation->id)->get());
+            return RelationResource::make($relation);
         } else {
             return $this->sendError("Relation Request doesn't exist or is not valid");
         }

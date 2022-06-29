@@ -180,8 +180,6 @@ class ResourceController extends Controller
             'views' => 'integer',
             'richTextContent' => 'string',
             'mediaUrl' => 'max:10000',
-            'tags' => 'string|min:2|max:55',
-            'is_exploited' => 'boolean',
             'status' => 'string|min:2|max:55',
             'scope' => 'string|min:2|max:55',
             'type_id' => 'required|integer',
@@ -204,8 +202,6 @@ class ResourceController extends Controller
         $resource->views = $request->views ?? $resource->views;
         $resource->richTextContent = $request->richTextContent ?? $resource->richTextContent;
         $resource->mediaUrl = $request->mediaUrl ? Storage::url(Storage::disk('public')->putFile('medias', $file)) : $resource->mediaUrl;
-        $resource->tags = $request->tags ?? $resource->tags;
-        $resource->is_exploited = $request->is_exploited ?? $resource->is_exploited;
         $resource->status = $request->status ?? $resource->status;
         $resource->scope = $request->scope ?? $resource->scope;
         $resource->type_id = $request->type_id ?? $resource->type_id;

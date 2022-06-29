@@ -14,7 +14,7 @@ class Type extends Model
      * @var string[]
      */
     protected $fillable = [
-        'label',
+        'name',
     ];
 
     /**

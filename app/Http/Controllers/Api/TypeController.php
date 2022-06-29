@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ClassifyResource;
 use App\Models\Type;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class TypeController extends Controller
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(Type::all(), 'Types retrieved successfully.');
+        return $this->sendResponse(ClassifyResource::collection(Type::all()), 'Types retrieved successfully.');
     }
 
     /**
@@ -44,7 +45,7 @@ class TypeController extends Controller
             return $this->sendError('Type not found.');
         }
 
-        return $this->sendResponse(self::TypeValidator($type), 'Type found successfully.');
+        return $this->sendResponse(ClassifyResource::make($type), 'Type found successfully.');
     }
 
     /**
@@ -74,9 +75,9 @@ class TypeController extends Controller
     /**
      * @param Request $request
      * @param null $id
-     * @return Type|JsonResponse
+     * @return ClassifyResource
      */
-    public function TypeValidator(Request $request, $id = null): Type|JsonResponse
+    public function TypeValidator(Request $request, $id = null): ClassifyResource
     {
 
         $validator = Validator::make($request->all(), [
@@ -88,9 +89,9 @@ class TypeController extends Controller
         }
 
         $type = $id ? Type::find($id) : new Type();
-        $type->label = $request->label;
+        $type->name = $request->name;
         $type->save();
 
-        return $type;
+        return ClassifyResource::make($type);
     }
 }

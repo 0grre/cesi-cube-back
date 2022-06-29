@@ -2,10 +2,9 @@
 
 namespace App\Http\Resources;
 
-
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class RelationResource extends JsonResource
+class CommentResource extends JsonResource
 {
     /**
      * @param $request
@@ -15,9 +14,8 @@ class RelationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'relationType' => $this->relation_type->name,
-            'firstUser' => UserResource::make($this->first_user),
-            'secondUser' => UserResource::make($this->second_user),
+            'content' => $this->content,
+            'author' => UserResource::make($this->user),
             'createdAt' => $this->created_at->format('d/m/Y'),
             'updatedAt' => $this->updated_at->format('d/m/Y'),
         ];

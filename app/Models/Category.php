@@ -14,7 +14,7 @@ class Category extends Model
      * @var string[]
      */
     protected $fillable = [
-        'label',
+        'name',
     ];
 
     /**

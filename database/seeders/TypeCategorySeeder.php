@@ -40,13 +40,13 @@ class TypeCategorySeeder extends Seeder
 
         foreach($categories as $category){
             $resourceCategory = new Category();
-            $resourceCategory->label = $category;
+            $resourceCategory->name = $category;
             $resourceCategory->save();
         }
 
         foreach($types as $type){
             $resourceType = new Type();
-            $resourceType->label = $type;
+            $resourceType->name = $type;
             $resourceType->save();
         }
     }

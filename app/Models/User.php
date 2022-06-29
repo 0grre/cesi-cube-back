@@ -105,7 +105,17 @@ class User extends Authenticatable
     public function favorites(): BelongsToMany
     {
         return $this->belongsToMany(Resource::class, 'favorites')
-            ->using(ReadLater::class)
+            ->using(Favorite::class)
             ->as('favorites')->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function exploited(): BelongsToMany
+    {
+        return $this->belongsToMany(Resource::class, 'exploited')
+            ->using(Exploited::class)
+            ->as('exploited')->withTimestamps();
     }
 }

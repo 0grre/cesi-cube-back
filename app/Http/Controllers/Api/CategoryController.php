@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ClassifyResource;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class CategoryController extends Controller
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(Category::all(), 'Categories retrieved successfully.');
+        return $this->sendResponse(ClassifyResource::collection(Category::all()), 'Categories retrieved successfully.');
     }
 
     /**
@@ -44,7 +45,7 @@ class CategoryController extends Controller
             return $this->sendError('Category not found.');
         }
 
-        return $this->sendResponse(self::CategoryValidator($category), 'Category found successfully.');
+        return $this->sendResponse(ClassifyResource::make($category), 'Category found successfully.');
     }
 
     /**
@@ -74,9 +75,9 @@ class CategoryController extends Controller
     /**
      * @param Request $request
      * @param null $id
-     * @return Category|JsonResponse
+     * @return JsonResponse|ClassifyResource
      */
-    public function CategoryValidator(Request $request, $id = null): Category|JsonResponse
+    public function CategoryValidator(Request $request, $id = null): JsonResponse|ClassifyResource
     {
 
         $validator = Validator::make($request->all(), [
@@ -88,9 +89,9 @@ class CategoryController extends Controller
         }
 
         $category = $id ? Category::find($id) : new Category();
-        $category->label = $request->label;
+        $category->name = $request->name;
         $category->save();
 
-        return $category;
+        return ClassifyResource::make($category);
     }
 }

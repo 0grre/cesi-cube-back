@@ -20,8 +20,6 @@ class Resource extends Model
         'views',
         'richTextContent',
         'mediaUrl',
-        'tags',
-        'is_exploited',
         'status',
         'scope',
         'type_id',
@@ -75,6 +73,14 @@ class Resource extends Model
      */
     public function favorites(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)->using(ReadLater::class)->withTimestamps();
+        return $this->belongsToMany(User::class)->using(Favorite::class)->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function exploited(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)->using(Exploited::class)->withTimestamps();
     }
 }

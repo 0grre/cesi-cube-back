@@ -19,8 +19,6 @@ return new class extends Migration
             $table->bigInteger('views')->nullable();
             $table->text('richTextContent')->nullable();
             $table->text('mediaUrl')->nullable();
-            $table->string('tags')->nullable();
-            $table->boolean('is_exploited')->nullable();
             $table->string('status')->nullable();
             $table->string('scope')->nullable();
             $table->unsignedBigInteger('type_id')->nullable()->unsigned();

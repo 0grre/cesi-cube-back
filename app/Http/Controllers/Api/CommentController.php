@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CommentResource;
 use App\Models\Comment;
 use App\Models\Resource;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +21,7 @@ class CommentController extends Controller
     {
         $comments = Resource::find($id)->comments()->get();
 
-        return $this->sendResponse($comments, 'Comments retrieved successfully.');
+        return $this->sendResponse(CommentResource::collection($comments), 'Comments retrieved successfully.');
     }
 
     /**
@@ -50,7 +51,7 @@ class CommentController extends Controller
             return $this->sendError('Comment not found.');
         }
 
-        return $this->sendResponse($comment, 'Comment found successfully.');
+        return $this->sendResponse(CommentResource::make($comment), 'Comment found successfully.');
     }
 
     /**
@@ -78,11 +79,10 @@ class CommentController extends Controller
      * @param Request $request
      * @param null $resource_id
      * @param null $id
-     * @return Comment|JsonResponse
+     * @return CommentResource|JsonResponse
      */
-    public function CommentValidator(Request $request, $resource_id = null, $id = null): Comment|JsonResponse
+    public function CommentValidator(Request $request, $resource_id = null, $id = null): CommentResource|JsonResponse
     {
-
         $validator = Validator::make($request->all(), [
             'content' => 'required|string|min:2|max:255',
         ]);
@@ -97,6 +97,6 @@ class CommentController extends Controller
         $comment->user_id = Auth::user()->getAuthIdentifier();
         $comment->save();
 
-        return $comment;
+        return CommentResource::make($comment);
     }
 }

@@ -37,10 +37,8 @@ class ResourceSeeder extends Seeder
                 ut labore et dolore magna aliqua. Vitae sapien pellentesque habitant morbi tristique senectus et.
                 Diam maecenas sed enim ut. Accumsan lacus vel facilisis volutpat est. Ut aliquam purus sit amet luctus.
                 Lorem ipsum dolor sit amet consectetur adipiscing elit ut.";
-                $resource->tags = "test tag";
                 $resource->status = $status[rand(0,2)];
                 $resource->scope = $scopes[rand(0,2)];
-                $resource->is_exploited = true;
                 $resource->type_id = rand(1, 4);
                 $resource->category_id = rand(1, 13);
                 $resource->user_id = $user->id;

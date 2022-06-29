@@ -19,8 +19,7 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
-        //à voir paginator et resource
-        return $this->sendResponse(DB::table('users')->paginate(10), 'Users found successfully.');
+        return $this->sendResponse(UserResource::collection(User::all()), 'Users found successfully.');
     }
 
     /**
@@ -48,7 +47,7 @@ class UserController extends Controller
             return $this->sendError('User not found.');
         }
 
-        return $this->sendResponse($user, 'User found successfully.');
+        return $this->sendResponse(UserResource::make($user), 'User found successfully.');
     }
 
     /**

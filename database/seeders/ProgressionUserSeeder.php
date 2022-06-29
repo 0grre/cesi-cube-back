@@ -33,5 +33,14 @@ class ProgressionUserSeeder extends Seeder
                 $user->read_later()->attach($resource);
             }
         }
+        for ($i = 0; $i <= 25; $i++) {
+            $user = User::inRandomOrder()->limit(1)->first();
+            $resource = Resource::inRandomOrder()->limit(1)->first();
+
+            if (!$user->exploited()->where('resource_id', $resource->id)->exists())
+            {
+                $user->exploited()->attach($resource);
+            }
+        }
     }
 }

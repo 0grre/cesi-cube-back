@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ClassifyResource;
 use App\Models\RelationType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class RelationTypeController extends Controller
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(RelationType::all(), 'RelationTypes retrieved successfully.');
+        return $this->sendResponse(ClassifyResource::collection(RelationType::all()), 'RelationTypes retrieved successfully.');
     }
 
     /**
@@ -44,7 +45,7 @@ class RelationTypeController extends Controller
             return $this->sendError('RelationType not found.');
         }
 
-        return $this->sendResponse(self::RelationTypeValidator($relation_type), 'RelationType found successfully.');
+        return $this->sendResponse(ClassifyResource::make($relation_type), 'RelationType found successfully.');
     }
 
     /**
@@ -74,9 +75,9 @@ class RelationTypeController extends Controller
     /**
      * @param Request $request
      * @param null $id
-     * @return RelationType|JsonResponse
+     * @return ClassifyResource|JsonResponse
      */
-    public function RelationTypeValidator(Request $request, $id = null): RelationType|JsonResponse
+    public function RelationTypeValidator(Request $request, $id = null): ClassifyResource|JsonResponse
     {
 
         $validator = Validator::make($request->all(), [
@@ -91,6 +92,6 @@ class RelationTypeController extends Controller
         $relation_type->name = $request->name;
         $relation_type->save();
 
-        return $relation_type;
+        return ClassifyResource::make($relation_type);
     }
 }
