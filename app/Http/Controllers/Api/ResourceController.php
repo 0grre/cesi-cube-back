@@ -189,13 +189,15 @@ class ResourceController extends Controller
             return $this->sendError('Validation Error . ', (array)$validator->errors());
         }
 
-        if(!str_starts_with($request->mediaUrl, '/storage')){
+        if(!empty($request->mediaUrl) && !str_starts_with($request->mediaUrl, '/storage')){
             $decoded = base64_decode($request->mediaUrl);
             $file = 'media';
             file_put_contents($file, $decoded);
             $resource->mediaUrl = Storage::url(Storage::disk('public')->putFile('medias', $file));
+        } elseif (!empty($request->mediaUrl)) {
+            $resource->mediaUrl = $request->mediaUrl;
         } else {
-            $resource->mediaUrl = $request->mediaUrl ?? null;
+            $resource->mediaUrl = null;
         }
 
         $resource->title = $request->title ?? $resource->title;
