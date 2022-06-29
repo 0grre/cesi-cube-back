@@ -42,7 +42,7 @@ class CommentController extends Controller
      * @param $id
      * @return JsonResponse
      */
-    public function show($id): JsonResponse
+    public function show($resource_id, $id): JsonResponse
     {
         $comment = Comment::find($id);
 
@@ -55,11 +55,20 @@ class CommentController extends Controller
 
     /**
      * Update the specified resource in storage.
-
      */
     public function update(Request $request, $resource_id, $id): JsonResponse
     {
-        return $this->sendResponse(self::CommentValidator($request, $resource_id, $id), 'Comment updated successfully.');
+        $comment = Comment::find($id);
+
+        if (is_null($comment)) {
+            return $this->sendError('Comment not found.');
+        }
+
+        if (self::check_owner($comment)) {
+            return $this->sendResponse(self::CommentValidator($request, $resource_id, $id), 'Comment updated successfully.');
+        } else {
+            return $this->sendError('Validation Error.', (array)'this comment does not belong to you');
+        }
     }
 
     /**
@@ -114,14 +123,14 @@ class CommentController extends Controller
             'content' => 'required|string|min:2|max:255',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return $this->sendError('Validation Error.', (array)$validator->errors());
         }
 
         $comment = $id ? Comment::find($id) : new Comment();
         $comment->content = request('content');
         $comment->resource_id = $resource_id;
-        $comment->user_id = Auth::user()->getAuthIdentifier();
+        $comment->user_id = $id ? $comment->user_id : Auth::user()->getAuthIdentifier();
         $comment->save();
 
         return CommentResource::make($comment);

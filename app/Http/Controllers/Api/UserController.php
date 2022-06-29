@@ -102,8 +102,6 @@ class UserController extends Controller
         $file = '/avatar';
         file_put_contents($file, $decoded);
 
-        $user->email = $request->email ?? $user->email;
-        $user->password = $request->password ? Hash::make($request->password) : $user->password;
         $user->avatar = $request->avatar ? Storage::url(Storage::disk('public')->putFile('avatars', $file)) : null;
         $user->firstname = $request->firstname ?? $user->firstname;
         $user->lastname = $request->lastname ?? $user->lastname;
@@ -161,8 +159,6 @@ class UserController extends Controller
     public function UserValidator(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'email|unique:users|nullable',
-            'password' => 'string|min:4|nullable',
             'firstname' => 'string|min:2|max:55|nullable',
             'lastname' => 'string|min:2|max:55|nullable',
             'address1' => 'string|min:2|max:255|nullable',
