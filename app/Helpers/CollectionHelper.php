@@ -10,6 +10,7 @@ class CollectionHelper
 {
     /**
      *
+     * @param $items
      * @param int $perPage
      * @param int|null $page
      * @param array $options
@@ -22,6 +23,6 @@ class CollectionHelper
 
         $items = $items instanceof Collection ? $items : Collection::make($items);
 
-        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+        return new LengthAwarePaginator([...$items->forPage($page, $perPage)], $items->count(), $perPage, $page, $options);
     }
 }
