@@ -8,7 +8,6 @@ use App\Http\Resources\ResourceResource;
 use App\Models\Resource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -46,19 +45,21 @@ class ResourceController extends Controller
                         ['resources.deleted_at', null]])
                     ->union($user_resources)
                     ->select('resources.*')
+                    ->orderBy('created_at', 'desc')
                     ->get();
 
                 $resources = $shared_resources;
 
             } else if (Auth::user()->hasRole(['super-admin', 'admin'])) {
-                $resources = Resource::all();
+                $resources = Resource::orderBy('created_at', 'desc')->get();
             }
         } else {
             $resources = Resource::where([
                 ['resources.status', '=', 'accepted'],
                 ['resources.scope', '=', 'public'],
                 ['resources.deleted_at', null]
-            ])->get();
+            ])->orderBy('created_at', 'desc')
+                ->get();
         }
 
         return $this->sendResponse(CollectionHelper::paginate(ResourceResource::collection(collect($resources)), 10), 'Resources found successfully.');
@@ -183,8 +184,8 @@ class ResourceController extends Controller
             'mediaUrl' => 'max:10000',
             'status' => 'string | min:2 | max:55',
             'scope' => 'string | min:2 | max:55',
-            'type_id' => 'required | integer',
-            'category_id' => 'required | integer',
+            'type' => 'required',
+            'category' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -202,13 +203,18 @@ class ResourceController extends Controller
             $resource->mediaUrl = null;
         }
 
+        if (!$request->status and !$resource->status){
+            $resource->status = 'pending';
+        } else {
+            $resource->status = $request->status;
+        }
+
         $resource->title = $request->title ?? $resource->title;
         $resource->views = $request->views ?? $resource->views;
         $resource->richTextContent = $request->richTextContent ?? $resource->richTextContent;
-        $resource->status = $request->status ?? $resource->status;
         $resource->scope = $request->scope ?? $resource->scope;
-        $resource->type_id = $request->type_id ?? $resource->type_id;
-        $resource->category_id = $request->category_id ?? $resource->category_id;
+        $resource->type_id = $request->type['id'] ?? $resource->type_id;
+        $resource->category_id = $request->category['id'] ?? $resource->category_id;
         $resource->user_id = $id ? $resource->user_id : Auth::user()?->getAuthIdentifier();
 
         $resource->save();

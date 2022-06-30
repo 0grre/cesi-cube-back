@@ -101,11 +101,12 @@
 ##### Todos:
 * Back:
   - [ ] FILTRES
-  - [ ] pagination
+  - [x] pagination
   - [ ] Recherche avec scout
-  - [ ] category et type création/update resource 
+  - [x] category et type création/update resource 
   - [x] Event resource views
 * Bonus:
+  - [ ] lien dans resources
   - [ ] réponse commentaire
   - [ ] RGPD / cookies
   - [ ] Aide application
