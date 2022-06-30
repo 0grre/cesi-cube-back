@@ -62,7 +62,7 @@ class ResourceController extends Controller
             ])->get();
         }
 
-        return $this->sendResponse(new Paginator(ResourceResource::collection(collect($resources)), 10), 'Resources found successfully.');
+        return $this->sendResponse(new Paginator(ResourceResource::collection(collect($resources)), 6), 'Resources found successfully.');
     }
 
     /**

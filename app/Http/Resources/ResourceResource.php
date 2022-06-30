@@ -16,8 +16,8 @@ class ResourceResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'type' => $this->type->name,
-            'category' => $this->category->name,
+            'type' => $this->type,
+            'category' => $this->category,
             'views' => $this->views,
             'richTextContent' => $this->richTextContent,
             'mediaUrl' => $this->mediaUrl,
