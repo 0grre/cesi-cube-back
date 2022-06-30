@@ -98,6 +98,9 @@ class ResourceController extends Controller
             return $this->sendError('Resource is not accessible');
         }
 
+        $resource->views += 1;
+        $resource->save();
+
         return $this->sendResponse(ResourceResource::make($resource), 'Resource found successfully . ');
     }
 

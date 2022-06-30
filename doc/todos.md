@@ -42,16 +42,24 @@
 ##### Filtres:
 * Resources:
   - Recherche (txt) js ?
+      - Titre
+      - Contenu
   - Date de publication
-  - Catégories
-  - Types
-  - Nombre de vues
-  - Nombre de exploitées
-  - Nombre de lire plus tard
-  - Nombre de favoris
+      - Croissant
+      - Décroissant
+      - Date exacte
+  - Catégories (liste déroulante)
+  - Types (liste déroulante)
+  - Auteur
+  - Scope
+      - Partagées
+      - Publique
 
 * Users (citizen):
   - Recherche (txt) js ?
+    - Nom
+    - Prénom
+    - Email
 
 ##### Statistiques:
 * Users:
@@ -81,7 +89,7 @@
   - [ ] Register
   - [ ] Profile
   - [ ] Resources (progression user/ resources / relations)
-  - [ ] Resource Info (commentaire)
+  - [ ] Resource Info (commentaires)
   - [ ] Users/relations
   - [ ] Page présentation application
 * Back-Office:
@@ -93,6 +101,7 @@
 ##### Todos:
 * Back:
   - [ ] FILTRES
+  - [x] Event resource views
 * Bonus:
   - [ ] réponse commentaire
   - [ ] RGPD / cookies
