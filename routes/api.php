@@ -11,14 +11,10 @@ use App\Http\Controllers\Api\RelationTypeController;
 use App\Http\Controllers\Api\ResourceController;
 use App\Http\Controllers\Api\TypeController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Resources\UserResource;
-use App\Models\Resource;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
-use Spatie\Permission\Models\Role;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,16 +22,27 @@ use Spatie\Permission\Models\Role;
 |--------------------------------------------------------------------------
 */
 
-/*
-| Not connected citizen
-*/
-Route::post('/register', [RegisterController::class, 'register']);
-Route::post('/login', [RegisterController::class, 'login']);
-Route::get('/login', [RegisterController::class, 'login_failed'])->name('login');
+/* --- Not connected citizen --- */
+Route::middleware('guest')->group(function () {
 
-Route::get('/public/resources', [ResourceController::class, 'index']);
-Route::get('/public/resources/{id}', [ResourceController::class, 'show']);
+    /* --- Authentication --- */
+    Route::post('/register', [RegisterController::class, 'register']);
+    Route::post('/login', [RegisterController::class, 'login']);
+    Route::get('/login', [RegisterController::class, 'login_failed'])
+        ->name('login_failed');
 
+    /* --- Password --- */
+    Route::post('/forgot-password', [PasswordResetController::class, 'store']);
+    Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])
+        ->name('password.reset');
+    Route::post('/reset-password', [NewPasswordController::class, 'store']);
+
+    /* --- Public Resources --- */
+    Route::get('/public/resources', [ResourceController::class, 'index']);
+    Route::get('/public/resources/{id}', [ResourceController::class, 'show']);
+});
+
+/* --- Connected citizen --- */
 Route::middleware('auth:sanctum')->group(function () {
 
     /* --- Resources --- */
