@@ -30,7 +30,7 @@ class NewPasswordController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required|string|min:4|confirmed',
+            'password' => 'required|string|min:4',
             'token' => 'required|string',
         ]);
 
