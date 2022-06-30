@@ -101,6 +101,9 @@
 ##### Todos:
 * Back:
   - [ ] FILTRES
+  - [ ] pagination
+  - [ ] Recherche avec scout
+  - [ ] category et type création/update resource 
   - [x] Event resource views
 * Bonus:
   - [ ] réponse commentaire

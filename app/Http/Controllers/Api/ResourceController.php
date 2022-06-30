@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\CollectionHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ResourceResource;
 use App\Models\Resource;
@@ -50,9 +51,7 @@ class ResourceController extends Controller
                 $resources = $shared_resources;
 
             } else if (Auth::user()->hasRole(['super-admin', 'admin'])) {
-                $resources = DB::table('resources')
-                    ->select('resources.*')
-                    ->get();
+                $resources = Resource::all();
             }
         } else {
             $resources = Resource::where([
@@ -62,7 +61,7 @@ class ResourceController extends Controller
             ])->get();
         }
 
-        return $this->sendResponse(new Paginator(ResourceResource::collection(collect($resources)), 6), 'Resources found successfully.');
+        return $this->sendResponse(CollectionHelper::paginate(ResourceResource::collection(collect($resources)), 10), 'Resources found successfully.');
     }
 
     /**

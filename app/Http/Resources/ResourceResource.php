@@ -3,7 +3,6 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
 
 class ResourceResource extends JsonResource
 {
@@ -16,8 +15,8 @@ class ResourceResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'type' => $this->type,
-            'category' => $this->category,
+            'type' => ClassifyResource::make($this->type),
+            'category' => ClassifyResource::make($this->category),
             'views' => $this->views,
             'richTextContent' => $this->richTextContent,
             'mediaUrl' => $this->mediaUrl,
