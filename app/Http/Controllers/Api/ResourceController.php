@@ -26,7 +26,7 @@ class ResourceController extends Controller
             if (Auth::user()->hasRole(['citizen', 'moderator'])) {
                 $user_resources = DB::table('resources')
                     ->join('users', 'resources.user_id', '=', 'users.id')
-                    ->where([['resources.status', '=', 'accepted'], ['resources.deleted_at', null]])
+                    ->where([['resources.status', '=', 'accepted'], ['resources.deleted_at', '=', null]])
                     ->where('resources.scope', '=', 'public')
                     ->orWhere('resources.user_id', Auth::user()->getAuthIdentifier())
                     ->select('resources.*');
@@ -43,7 +43,7 @@ class ResourceController extends Controller
                     ->where([
                         ['resources.status', '=', 'accepted'],
                         ['resources.scope', '=', 'shared'],
-                        ['resources.deleted_at', null]])
+                        ['resources.deleted_at','=', null]])
                     ->union($user_resources)
                     ->select('resources.*')
                     ->orderBy('created_at', 'desc')
@@ -182,7 +182,7 @@ class ResourceController extends Controller
             'title' => 'required | string',
             'views' => 'integer',
             'richTextContent' => 'string',
-            'mediaUrl' => 'max:10000',
+            'mediaUrl' => 'string',
             'status' => 'string | min:2 | max:55',
             'scope' => 'string | min:2 | max:55',
             'type' => 'required',
