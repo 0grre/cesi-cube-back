@@ -65,9 +65,7 @@ class Resource extends Model
      */
     public function read_later(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'read_later')
-            ->using(ReadLater::class)
-            ->as('read_later')->withTimestamps();
+        return $this->belongsToMany(User::class, 'read_later')->withTimestamps();
     }
 
     /**
@@ -75,9 +73,7 @@ class Resource extends Model
      */
     public function favorites(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'favorites')
-            ->using(ReadLater::class)
-            ->as('read_later')->withTimestamps();
+        return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
     }
 
     /**
@@ -85,8 +81,6 @@ class Resource extends Model
      */
     public function exploited(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'exploited')
-            ->using(ReadLater::class)
-            ->as('read_later')->withTimestamps();
+        return $this->belongsToMany(User::class, 'exploited')->withTimestamps();
     }
 }

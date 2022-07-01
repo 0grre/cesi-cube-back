@@ -98,9 +98,7 @@ class User extends Authenticatable
      */
     public function read_later(): BelongsToMany
     {
-        return $this->belongsToMany(Resource::class, 'read_later')
-            ->using(ReadLater::class)
-            ->as('read_later')->withTimestamps();
+        return $this->belongsToMany(Resource::class, 'read_later')->withTimestamps();
     }
 
     /**
@@ -108,9 +106,7 @@ class User extends Authenticatable
      */
     public function favorites(): BelongsToMany
     {
-        return $this->belongsToMany(Resource::class, 'favorites')
-            ->using(Favorite::class)
-            ->as('favorites')->withTimestamps();
+        return $this->belongsToMany(Resource::class, 'favorites')->withTimestamps();
     }
 
     /**
@@ -118,9 +114,7 @@ class User extends Authenticatable
      */
     public function exploited(): BelongsToMany
     {
-        return $this->belongsToMany(Resource::class, 'exploited')
-            ->using(Exploited::class)
-            ->as('exploited')->withTimestamps();
+        return $this->belongsToMany(Resource::class, 'exploited')->withTimestamps();
     }
 
     /**

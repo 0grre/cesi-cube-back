@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Models\Resource;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -138,4 +139,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/test', function () {
 
+    return Resource::find(10)->exploited;
 });
