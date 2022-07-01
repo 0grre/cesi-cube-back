@@ -18,6 +18,10 @@ class FavoriteController extends Controller
     {
         $user = User::find($user_id);
 
+        if (is_null($user)) {
+            return $this->sendError('User not found.');
+        }
+
         return $this->sendResponse(ResourceResource::collection($user->favorites()->get()), 'Favorite resource list retrieved successfully.');
     }
 
@@ -31,13 +35,22 @@ class FavoriteController extends Controller
     public function store($user_id, $resource_id): JsonResponse
     {
         $user = User::find($user_id);
+
+        if (is_null($user)) {
+            return $this->sendError('User not found.');
+        }
+
         $resource = Resource::find($resource_id);
+
+        if (is_null($resource)) {
+            return $this->sendError('Resource not found . ');
+        }
 
         if (!$user->favorites()->where('resource_id', $resource->id)->exists())
         {
             $user->favorites()->attach($resource);
 
-            return $this->sendResponse(ResourceResource::collection($user->favorites()->get()), 'Resource add to favorites list successfully.');
+            return $this->sendResponse(ResourceResource::make($resource), 'Resource add to favorites list successfully.');
         } else {
 
             return $this->sendError('Validation Error.', (array)'Resource favorites exist');
@@ -54,8 +67,18 @@ class FavoriteController extends Controller
     {
         $user = User::find($user_id);
 
-        $user->favorites()->detach($resource_id);
+        if (is_null($user)) {
+            return $this->sendError('User not found.');
+        }
 
-        return $this->sendResponse([], 'Resource remove to favorite list successfully.');
+        $resource = Resource::find($resource_id);
+
+        if (is_null($resource)) {
+            return $this->sendError('Resource not found . ');
+        }
+
+        $user->favorites()->detach($resource->id);
+
+        return $this->sendResponse(ResourceResource::make($resource), 'Resource remove to favorite list successfully.');
     }
 }
