@@ -25,10 +25,14 @@ class ResourceController extends Controller
         if (Auth::user()) {
             if (Auth::user()->hasRole(['citizen', 'moderator'])) {
                 $user_resources = DB::table('resources')
+                    ->whereNull('resources.deleted_at')
+                    ->where(function($query) {
+                        $query->where([
+                            ['resources.status', '=', 'accepted'],
+                            ['resources.scope', '=', 'public']
+                        ])->orWhere('resources.user_id', Auth::user()->getAuthIdentifier());
+                    })
                     ->join('users', 'resources.user_id', '=', 'users.id')
-                    ->where([['resources.status', '=', 'accepted'], ['resources.deleted_at', '=', null]])
-                    ->where('resources.scope', '=', 'public')
-                    ->orWhere('resources.user_id', Auth::user()->getAuthIdentifier())
                     ->select('resources.*');
 
                 $relations = DB::table('relations')
@@ -40,11 +44,11 @@ class ResourceController extends Controller
                         ->orOn('resources.user_id', '=', 'relations.second_user_id');
                 })
                     ->join('users', 'resources.user_id', '=', 'users.id')
+                    ->whereNull('resources.deleted_at')
                     ->where([
-                        ['resources.status', '=', 'accepted'],
                         ['resources.scope', '=', 'shared'],
-                        ['resources.deleted_at','=', null]])
-                    ->union($user_resources)
+                        ['resources.status', '=', 'accepted']
+                    ])->union($user_resources)
                     ->select('resources.*')
                     ->orderBy('created_at', 'desc')
                     ->get();

@@ -24,6 +24,7 @@ class ResourceResource extends JsonResource
             'scope' => $this->scope,
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
+            'deletedAt' => $this->deleted_at,
             'readLater' => UserIdResource::collection($this->read_later()->get()),
             'favorites' => UserIdResource::collection($this->favorites()->get()),
             'exploited' => UserIdResource::collection($this->exploited()->get()),
