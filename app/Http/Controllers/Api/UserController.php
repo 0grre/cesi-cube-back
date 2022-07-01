@@ -6,6 +6,7 @@ use App\Helpers\CollectionHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -136,7 +137,7 @@ class UserController extends Controller
             return $this->sendError('User not found.');
         }
 
-        $user->disabled_at = date('Y-m-d H:i:s');
+        $user->disabled_at = Carbon::now();
         $user->save();
 
         return $this->sendResponse(UserResource::make($user), 'User disabled successfully.');

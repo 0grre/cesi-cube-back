@@ -6,6 +6,7 @@ use App\Helpers\CollectionHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ResourceResource;
 use App\Models\Resource;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -142,7 +143,7 @@ class ResourceController extends Controller
 
         if (self::check_owner($resource)) {
 
-            $resource->disabled_at = date('Y - m - d H:i:s');
+            $resource->deleted_at = Carbon::now();
             $resource->save();
 
             return $this->sendResponse([], 'Resource deleted successfully . ');
