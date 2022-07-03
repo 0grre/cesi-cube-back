@@ -9,7 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use JetBrains\PhpStorm\ArrayShape;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Scout\Attributes\SearchUsingPrefix;
+use Laravel\Scout\Searchable;
+use Omalizadeh\QueryFilter\Traits\HasFilter;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -17,7 +21,7 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, Searchable, HasFilter;
 
     /**
      * The attributes that are mass assignable.
@@ -41,8 +45,6 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
      * @var array<int, string>
      */
     protected $hidden = [
@@ -51,13 +53,71 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
-     *
      * @var array<string, string>
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * @return string
+     */
+    public function searchableAs(): string
+    {
+        return 'users_index';
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getScoutKey(): mixed
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScoutKeyName(): string
+    {
+        return 'id';
+    }
+
+    /**
+     * @return array
+     */
+    #[ArrayShape([
+        'id' => "mixed",
+        'email' => "string",
+        'firstname' => "mixed",
+        'lastname' => "mixed",
+        'city' => "mixed",
+        'createdAt' => "mixed",
+        'updatedAt' => "mixed",
+        'deletedAt' => "mixed",
+    ])]
+    #[SearchUsingPrefix(['email', 'firstname', 'lastname', 'city'])]
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'email' => $this->email,
+            'firstname' => $this->firstname,
+            'lastname' => $this->lastname,
+            'city' => $this->city,
+            'createdAt' => $this->created_at,
+            'updatedAt' => $this->updated_at,
+            'deletedAt' => $this->disabled_at,
+        ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldBeSearchable(): bool
+    {
+        return $this->hasRole('citizen') && !$this->disabled_at;
+    }
 
     /**
      * @return HasMany

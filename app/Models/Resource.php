@@ -2,15 +2,20 @@
 
 namespace App\Models;
 
+use App\Http\Resources\ClassifyResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use JetBrains\PhpStorm\ArrayShape;
+use Laravel\Scout\Attributes\SearchUsingPrefix;
+use Laravel\Scout\Searchable;
+use Omalizadeh\QueryFilter\Traits\HasFilter;
 
 class Resource extends Model
 {
-    use HasFactory;
+    use HasFactory, HasFilter, Searchable;
 
     /**
      * @var string[]
@@ -27,6 +32,62 @@ class Resource extends Model
         'user_id',
         'deleted_at',
     ];
+
+    /**
+     * @return string
+     */
+    public function searchableAs(): string
+    {
+        return 'resources_index';
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getScoutKey(): mixed
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScoutKeyName(): string
+    {
+        return 'id';
+    }
+
+    /**
+     * @return array
+     */
+    #[ArrayShape([
+        'id' => "mixed",
+        'title' => "mixed",
+        'richTextContent' => "mixed",
+        'createdAt' => "mixed",
+        'updatedAt' => "mixed",
+        'deletedAt' => "mixed",
+    ])]
+    #[SearchUsingPrefix(['title', 'richTextContent'])]
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'richTextContent' => $this->richTextContent,
+            'createdAt' => $this->created_at,
+            'updatedAt' => $this->updated_at,
+            'deletedAt' => $this->deleted_at,
+        ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldBeSearchable(): bool
+    {
+        return $this->status == 'accepted' && $this->scope == 'public' && !$this->deleted_at;
+    }
 
     /**
      * @return BelongsTo

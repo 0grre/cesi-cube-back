@@ -189,8 +189,8 @@ class ResourceController extends Controller
             'mediaUrl' => 'string',
             'status' => 'string | min:2 | max:55',
             'scope' => 'string | min:2 | max:55',
-            'type' => 'required',
-            'category' => 'required',
+//            'type' => 'required',
+//            'category' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -208,9 +208,9 @@ class ResourceController extends Controller
             $resource->mediaUrl = null;
         }
 
-        if (!$request->status and !$resource->status){
+        if (!$id) {
             $resource->status = 'pending';
-        } else {
+        } else if ($request->status) {
             $resource->status = $request->status;
         }
 
@@ -220,7 +220,7 @@ class ResourceController extends Controller
         $resource->scope = $request->scope ?? $resource->scope;
         $resource->type_id = $request->type['id'] ?? $resource->type_id;
         $resource->category_id = $request->category['id'] ?? $resource->category_id;
-        $resource->user_id = $id ? $resource->user_id : Auth::user()?->getAuthIdentifier();
+        $resource->user_id = $id ? $resource->user_id : Auth::user()->getAuthIdentifier();
 
         $resource->save();
 

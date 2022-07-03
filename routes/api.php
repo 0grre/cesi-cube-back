@@ -137,4 +137,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/test', function () {
 
+    $user = \App\Models\Resource::find(7);
+    if (!$request->status and !$resource->status){
+        $resource->status = 'pending';
+    } else {
+        $resource->status = $request->status;
+    }
+//    dd($user);
+    return $user->status == 'accepted' && $user->scope == 'public' && !$user->deleted_at;
 });
