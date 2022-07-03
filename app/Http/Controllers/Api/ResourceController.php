@@ -184,7 +184,6 @@ class ResourceController extends Controller
 
         $validator = Validator::make($request->all(), [
             'title' => 'required | string',
-            'views' => 'integer',
             'richTextContent' => 'string',
             'mediaUrl' => 'string',
             'status' => 'string | min:2 | max:55',
@@ -197,7 +196,7 @@ class ResourceController extends Controller
             return $this->sendError('Validation Error . ', (array)$validator->errors());
         }
 
-        if(!empty($request->mediaUrl) && !str_starts_with($request->mediaUrl, '/storage')){
+        if (!empty($request->mediaUrl) && !str_starts_with($request->mediaUrl, '/storage')) {
             $decoded = base64_decode($request->mediaUrl);
             $file = 'media';
             file_put_contents($file, $decoded);
@@ -208,7 +207,7 @@ class ResourceController extends Controller
             $resource->mediaUrl = null;
         }
 
-        if (!$request->status and !$resource->status){
+        if (!$request->status and !$resource->status) {
             $resource->status = 'pending';
         } else {
             $resource->status = $request->status;
