@@ -97,7 +97,6 @@ Route::middleware('auth:sanctum')->group(function () {
         /* --- Resource Comments --- */
         Route::get('/resources/{resource}/comments', [CommentController::class, 'index']);
         Route::post('/resources/{resource}/comments', [CommentController::class, 'store']);
-        Route::get('/resources/{resource}/comments/{comment}', [CommentController::class, 'show']);
         Route::put('/resources/{resource}/comments/{comment}', [CommentController::class, 'update']);
         Route::delete('/resources/{resource}/comments/{comment}', [CommentController::class, 'destroy']);
 

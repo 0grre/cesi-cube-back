@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CommentResource;
+use App\Http\Resources\ResourceResource;
 use App\Models\Comment;
 use App\Models\Resource;
 use Illuminate\Http\JsonResponse;
@@ -37,23 +38,6 @@ class CommentController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param $id
-     * @return JsonResponse
-     */
-    public function show($resource_id, $id): JsonResponse
-    {
-        $comment = Comment::find($id);
-
-        if (is_null($comment)) {
-            return $this->sendError('Comment not found.');
-        }
-
-        return $this->sendResponse(CommentResource::make($comment), 'Comment found successfully.');
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, $resource_id, $id): JsonResponse
@@ -73,11 +57,18 @@ class CommentController extends Controller
 
     /**
      *
+     * @param $resource_id
      * @param $id
      * @return JsonResponse
      */
-    public function destroy($id): JsonResponse
+    public function destroy($resource_id, $id): JsonResponse
     {
+        $resource = Resource::find($resource_id);
+
+        if (is_null($resource)) {
+            return $this->sendError('Resource not found.');
+        }
+
         $comment = Comment::find($id);
 
         if (is_null($comment)) {
@@ -88,7 +79,7 @@ class CommentController extends Controller
 
             $comment->delete();
 
-            return $this->sendResponse([], 'Comment deleted successfully.');
+            return $this->sendResponse(ResourceResource::make($resource), 'Comment deleted successfully.');
         } else {
             return $this->sendError('Validation Error.', (array)'this comment does not belong to you');
         }
@@ -115,10 +106,16 @@ class CommentController extends Controller
      * @param Request $request
      * @param null $resource_id
      * @param null $id
-     * @return CommentResource|JsonResponse
+     * @return JsonResponse|ResourceResource
      */
-    public function CommentValidator(Request $request, $resource_id = null, $id = null): CommentResource|JsonResponse
+    public function CommentValidator(Request $request, $resource_id, $id = null): JsonResponse|ResourceResource
     {
+        $resource = Resource::find($resource_id);
+
+        if (is_null($resource)) {
+            return $this->sendError('Resource not found.');
+        }
+
         $validator = Validator::make($request->all(), [
             'content' => 'required|string|min:2|max:255',
         ]);
@@ -129,10 +126,10 @@ class CommentController extends Controller
 
         $comment = $id ? Comment::find($id) : new Comment();
         $comment->content = request('content');
-        $comment->resource_id = $resource_id;
+        $comment->resource_id = $resource->id;
         $comment->user_id = $id ? $comment->user_id : Auth::user()->getAuthIdentifier();
         $comment->save();
 
-        return CommentResource::make($comment);
+        return ResourceResource::make($resource);
     }
 }
