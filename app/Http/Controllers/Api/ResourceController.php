@@ -197,13 +197,12 @@ class ResourceController extends Controller
 
         $validator = Validator::make($request->all(), [
             'title' => 'required | string',
-            'views' => 'integer',
             'richTextContent' => 'string',
             'mediaUrl' => 'string',
             'status' => 'string | min:2 | max:55',
             'scope' => 'string | min:2 | max:55',
-//            'type' => 'required',
-//            'category' => 'required',
+            'type' => 'required',
+            'category' => 'required',
         ]);
 
         if ($validator->fails()) {
