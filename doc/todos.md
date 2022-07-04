@@ -2,20 +2,20 @@
 
 ##### Roles:
 * Citoyen
-    - [ ] Lister les ressources
+    - [x] Lister les ressources
     - [ ] Lister les ressources restreintes
     - [ ] Filtrer et trier les ressources
-    - [ ] Afficher le contenu d’une ressource
-    - [ ] Création d’un compte citoyen
+    - [x] Afficher le contenu d’une ressource
+    - [x] Création d’un compte citoyen
 
 * Citoyen connecté
-    - [ ] Création / Edition d’une ressource
-    - [ ] Partage d’une publication
-    - [ ] Ajout d’un commentaire sur une ressource
+    - [x] Création / Edition d’une ressource
+    - [x] Partage d’une publication
+    - [x] Ajout d’un commentaire sur une ressource
     - [ ] Réponse à un commentaire
-    - [ ] Ajouter / Retirer une ressource de ses favorites
-    - [ ] Indiquer une ressource comme exploitée / non exploitée
-    - [ ] Mettre de côté une ressource / Annuler
+    - [x] Ajouter / Retirer une ressource de ses favorites
+    - [x] Indiquer une ressource comme exploitée / non exploitée
+    - [x] Mettre de côté une ressource / Annuler
     - [ ] Afficher un tableau de bord de progression
     - [ ] Démarrer une ressource de type Activité/Jeu
     - [ ] Inviter d’autres participants
@@ -40,7 +40,7 @@
     - [ ] Création d’un compte modérateur / administrateur / super-administrateur
 
 ##### Filtres:
-* Resources:
+* [ ] Resources:
   - Recherche (txt) js ?
       - Titre
       - Contenu
@@ -55,11 +55,12 @@
       - Partagées
       - Publique
 
-* Users (citizen):
+* [x] Users (citizen):
   - Recherche (txt) js ?
     - Nom
     - Prénom
     - Email
+    - city
 
 ##### Statistiques:
 * Users:
@@ -85,11 +86,11 @@
 
 ##### Pages:
 * Application:
-  - [ ] Login
-  - [ ] Register
+  - [x] Login
+  - [x] Register
   - [ ] Profile
   - [ ] Resources (progression user/ resources / relations)
-  - [ ] Resource Info (commentaires)
+  - [x] Resource Info (commentaires)
   - [ ] Users/relations
   - [ ] Page présentation application
 * Back-Office:
@@ -100,9 +101,9 @@
 
 ##### Todos:
 * Back:
-  - [ ] FILTRES
+  - [x] FILTRES
   - [x] pagination
-  - [ ] Recherche avec scout
+  - [x] Recherche avec scout
   - [x] category et type création/update resource 
   - [x] Event resource views
 * Bonus:
