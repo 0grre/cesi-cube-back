@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Filters\ResourceFilter;
 use App\Helpers\CollectionHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ResourceResource;
@@ -9,6 +10,7 @@ use App\Models\Resource;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -68,6 +70,17 @@ class ResourceController extends Controller
         }
 
         return $this->sendResponse(CollectionHelper::paginate(ResourceResource::collection(collect($resources)), 10), 'Resources found successfully.');
+    }
+
+    /**
+     * @param ResourceFilter $resourceFilter
+     * @return LengthAwarePaginator
+     */
+    public function search(ResourceFilter $resourceFilter): LengthAwarePaginator
+    {
+        $resourceFilterResult = Resource::filter($resourceFilter);
+
+        return CollectionHelper::paginate(ResourceResource::collection($resourceFilterResult->data()), 10);
     }
 
     /**

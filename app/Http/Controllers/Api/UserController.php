@@ -17,27 +17,16 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-//    /**
-//     * @return JsonResponse
-//     */
-//    public function index(): JsonResponse
-//    {
-//        return $this->sendResponse(CollectionHelper::paginate(UserResource::collection(User::all()), 10), 'Users found successfully.');
-//    }
-    public function index(UserFilter $userFilter)
+    /**
+     * @param UserFilter $userFilter
+     * @return JsonResponse
+     */
+    public function index(UserFilter $userFilter): JsonResponse
     {
         $userFilterResult = User::filter($userFilter);
 
-        // total resources count based on filters
-        $count = $userFilterResult->count();
-
-        // total sum of given attributes in filter if there is any
-        $sums = $userFilterResult->sums();
-
-        // Get query results as collection (paginated if there is pagination in filters)
-        $users = $userFilterResult->data();
-
-        return $users;
+        return $this->sendResponse(CollectionHelper::paginate(
+                UserResource::collection($userFilterResult->data()), 10), 'Users found successfully.');
     }
 
     /**

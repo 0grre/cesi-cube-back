@@ -2,6 +2,7 @@
 
 namespace App\Filters;
 
+use JetBrains\PhpStorm\ArrayShape;
 use Omalizadeh\QueryFilter\ModelFilter;
 
 class ResourceFilter extends ModelFilter
@@ -34,7 +35,9 @@ class ResourceFilter extends ModelFilter
     protected function sortableAttributes(): array
     {
         return [
-            //
+            'id',
+            'created_at',
+            'updated_at',
         ];
     }
 
@@ -44,9 +47,7 @@ class ResourceFilter extends ModelFilter
     protected function summableAttributes(): array
     {
         return [
-            'id',
-            'created_at',
-            'updated_at',
+            //
         ];
     }
 
@@ -73,20 +74,26 @@ class ResourceFilter extends ModelFilter
     }
 
     /**
-     * Attributes on relations that can be filtered.
-     *
-     * 'relation_name' => [
-     *      'filter_key' => 'db_column_name',
-     *  ],
-     * 'relation_name' => [
-     *      'filter_key_and_db_column_name',
-     *  ],
+     * @return array
      */
+    #[ArrayShape([
+        'user' => "string[]",
+        'type' => "string[]",
+        'category' => "string[]"
+    ])]
     protected function filterableRelations(): array
     {
         return [
-            'users' => [
-                'user_id' => 'user_id',
+            'user' => [
+                'firstname',
+                'lastname',
+                'email',
+            ],
+            'type' => [
+                'type_name' => 'name',
+            ],
+            'category' => [
+                'category_name' => 'name',
             ],
         ];
     }
@@ -97,7 +104,9 @@ class ResourceFilter extends ModelFilter
     protected function loadableRelations(): array
     {
         return [
-            'users',
+            'user',
+            'type',
+            'category'
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filters;
 
+use JetBrains\PhpStorm\ArrayShape;
 use Omalizadeh\QueryFilter\ModelFilter;
 
 class UserFilter extends ModelFilter
@@ -77,23 +78,16 @@ class UserFilter extends ModelFilter
     }
 
     /**
-     * Attributes on relations that can be filtered.
-     *
-     * 'relation_name' => [
-     *      'filter_key' => 'db_column_name',
-     *  ],
-     * 'relation_name' => [
-     *      'filter_key_and_db_column_name',
-     *  ],
+     * @return string[][]
      */
+    #[ArrayShape([
+        'roles' => "string[]",
+    ])]
     protected function filterableRelations(): array
     {
         return [
-            'role' => [
-                'filter_key' => 'db_column_name',
-            ],
-            'relations' => [
-                'filter_key_and_db_column_name',
+            'roles' => [
+                'name' => 'name',
             ],
         ];
     }
@@ -104,7 +98,7 @@ class UserFilter extends ModelFilter
     protected function loadableRelations(): array
     {
         return [
-            'role'
+            'roles'
         ];
     }
 }

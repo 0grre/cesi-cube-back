@@ -75,6 +75,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/relation_types/{id}', [RelationTypeController::class, 'show']);
 
         /* --- Resources --- ok */
+        Route::get('/search/resources', [ResourceController::class, 'search']);
         Route::post('/resources', [ResourceController::class, 'store']);
         Route::put('/resources/{id}', [ResourceController::class, 'update']);
         Route::delete('/resources/{id}', [ResourceController::class, 'destroy']);
@@ -137,12 +138,4 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/test', function () {
 
-    $user = \App\Models\Resource::find(7);
-    if (!$request->status and !$resource->status){
-        $resource->status = 'pending';
-    } else {
-        $resource->status = $request->status;
-    }
-//    dd($user);
-    return $user->status == 'accepted' && $user->scope == 'public' && !$user->deleted_at;
 });
