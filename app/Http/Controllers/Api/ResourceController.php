@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Filters\ResourceFilter;
 use App\Helpers\CollectionHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ResourceResource;
@@ -9,6 +10,7 @@ use App\Models\Resource;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -68,6 +70,17 @@ class ResourceController extends Controller
         }
 
         return $this->sendResponse(CollectionHelper::paginate(ResourceResource::collection(collect($resources)), 10), 'Resources found successfully.');
+    }
+
+    /**
+     * @param ResourceFilter $resourceFilter
+     * @return LengthAwarePaginator
+     */
+    public function search(ResourceFilter $resourceFilter): LengthAwarePaginator
+    {
+        $resourceFilterResult = Resource::filter($resourceFilter);
+
+        return CollectionHelper::paginate(ResourceResource::collection($resourceFilterResult->data()), 10);
     }
 
     /**
@@ -184,19 +197,20 @@ class ResourceController extends Controller
 
         $validator = Validator::make($request->all(), [
             'title' => 'required | string',
+            'views' => 'integer',
             'richTextContent' => 'string',
             'mediaUrl' => 'string',
             'status' => 'string | min:2 | max:55',
             'scope' => 'string | min:2 | max:55',
-            'type' => 'required',
-            'category' => 'required',
+//            'type' => 'required',
+//            'category' => 'required',
         ]);
 
         if ($validator->fails()) {
             return $this->sendError('Validation Error . ', (array)$validator->errors());
         }
 
-        if (!empty($request->mediaUrl) && !str_starts_with($request->mediaUrl, '/storage')) {
+        if(!empty($request->mediaUrl) && !str_starts_with($request->mediaUrl, '/storage')){
             $decoded = base64_decode($request->mediaUrl);
             $file = 'media';
             file_put_contents($file, $decoded);
@@ -207,9 +221,9 @@ class ResourceController extends Controller
             $resource->mediaUrl = null;
         }
 
-        if (!$request->status and !$resource->status) {
+        if (!$id) {
             $resource->status = 'pending';
-        } else {
+        } else if ($request->status) {
             $resource->status = $request->status;
         }
 
@@ -219,7 +233,7 @@ class ResourceController extends Controller
         $resource->scope = $request->scope ?? $resource->scope;
         $resource->type_id = $request->type['id'] ?? $resource->type_id;
         $resource->category_id = $request->category['id'] ?? $resource->category_id;
-        $resource->user_id = $id ? $resource->user_id : Auth::user()?->getAuthIdentifier();
+        $resource->user_id = $id ? $resource->user_id : Auth::user()->getAuthIdentifier();
 
         $resource->save();
 

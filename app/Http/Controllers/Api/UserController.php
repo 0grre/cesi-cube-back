@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Filters\UserFilter;
 use App\Helpers\CollectionHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
@@ -17,11 +18,15 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     /**
+     * @param UserFilter $userFilter
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index(UserFilter $userFilter): JsonResponse
     {
-        return $this->sendResponse(CollectionHelper::paginate(UserResource::collection(User::all()), 10), 'Users found successfully.');
+        $userFilterResult = User::filter($userFilter);
+
+        return $this->sendResponse(CollectionHelper::paginate(
+                UserResource::collection($userFilterResult->data()), 10), 'Users found successfully.');
     }
 
     /**
