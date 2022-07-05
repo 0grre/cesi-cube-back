@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RelationResource;
 use App\Models\Relation;
+use App\Models\RelationType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -95,10 +96,12 @@ class RelationController extends Controller
             'relationType' => 'required',
         ]);
 
+        $relationType = RelationType::where('name', $request->relationType);
+
         $relation_check = DB::table('relations')
-            ->where('relation_type_id', $request->relationType)
-            ->whereIn('first_user_id', [$user_id, $request->secondUser])
-            ->whereIn('second_user_id', [$user_id, $request->secondUser])
+            ->where('relation_type_id', $relationType->id)
+            ->whereIn('first_user_id', [$user_id, $request->secondUser->id])
+            ->whereIn('second_user_id', [$user_id, $request->secondUser->id])
             ->exists();
 
         if($validator->fails() or (!$id && $relation_check)){
@@ -114,8 +117,8 @@ class RelationController extends Controller
 
         $relation->is_accepted = $request->status == true ?? false;
         $relation->first_user_id = $user_id;
-        $relation->second_user_id = $request->secondUser;
-        $relation->relation_type_id = $request->relationType;
+        $relation->second_user_id = $request->secondUser->id;
+        $relation->relation_type_id = $relationType->id;
         $relation->save();
 
         return RelationResource::make($relation);
