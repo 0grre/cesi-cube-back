@@ -96,7 +96,7 @@ class RelationController extends Controller
             'relationType' => 'required',
         ]);
 
-        $relationType = RelationType::where('name', $request->relationType);
+        $relationType = RelationType::where('name', $request->relationType)->first();
 
         $relation_check = DB::table('relations')
             ->where('relation_type_id', $relationType->id)
@@ -106,7 +106,7 @@ class RelationController extends Controller
 
         if($validator->fails() or (!$id && $relation_check)){
             return $this->sendError('Validation Error.',
-                $relation_check ? ['Relation with user '. $request->secondUser['firstname']. ' ' . $request->secondUser['lastname'] .' exist'] : (array)$validator->errors());
+                $relation_check ? ['Relation with user '. $request->secondUser .' exist'] : (array)$validator->errors());
         }
 
         $relation = $id ? Relation::find($id) : new Relation();
@@ -115,7 +115,7 @@ class RelationController extends Controller
             return $this->sendError('Relation not found.');
         }
 
-        $relation->is_accepted = $request->status == true ?? false;
+        $relation->is_accepted = $request->isAccepted == true ?? false;
         $relation->first_user_id = $user_id;
         $relation->second_user_id = $request->secondUser['id'];
         $relation->relation_type_id = $relationType->id;
