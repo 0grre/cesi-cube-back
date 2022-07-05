@@ -40,6 +40,8 @@ $ php artisan serve
 ```
 -----------
 
+Créez un compte Algolia, créer uen nouvelle application.
+
 Pour scout, dans .env:
 
 ```

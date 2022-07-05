@@ -92,22 +92,8 @@
                             <a href="#" style="text-decoration: none; display:inline-block;">
                                 <div class="Logo">
                                     <div class="Wkn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="72" height="9" viewBox="0 0 85 10.5">
-                                            <title>Resources Relationnelles</title>
-                                            <g id="wokine">
-                                                <path d="M0,.17H2.45L4.61,7,6.94.14h2L11.24,7,13.4.17h2.39L12.24,10.4h-2L7.9,3.76,5.55,10.4h-2Z"></path>
-                                                <path d="M18.81,5.28v0A5.32,5.32,0,0,1,24.35,0a5.27,5.27,0,0,1,5.52,5.22v0a5.32,5.32,0,0,1-5.55,5.25A5.27,5.27,0,0,1,18.81,5.28Zm8.67,0v0a3.12,3.12,0,0,0-3.15-3.19A3.07,3.07,0,0,0,21.2,5.22v0a3.12,3.12,0,0,0,3.15,3.19A3.07,3.07,0,0,0,27.47,5.28Z"></path>
-                                                <path d="M34.28.17h2.29V4.61L40.79.17h2.77L39.32,4.48l4.43,5.84H41L37.78,6l-1.2,1.22v3.1H34.28Z"></path>
-                                                <path d="M47.62.17h2.29V10.33H47.62Z"></path>
-                                                <path d="M54.89.17H57l4.88,6.25V.17h2.26V10.33H62.19l-5-6.45v6.45H54.89Z"></path>
-                                                <path d="M69,.17h7.85v2H71.28V4.22h4.91v2H71.28V8.34h5.65v2H69Z"></path>
-                                            </g>
-                                            <g id="dot">
-                                                <path d="M85,1.91a1.7,1.7,0,0,1-3.39,0,1.7,1.7,0,0,1,3.39,0Z"></path>
-                                            </g>
-                                        </svg>
+                                            <h1>Resources <span>Relationnelles</span></h1>
                                     </div>
-                                    <span>Extranet</span>
                                 </div>
                             </a>
                         </td>
