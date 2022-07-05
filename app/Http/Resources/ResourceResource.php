@@ -22,7 +22,7 @@ class ResourceResource extends JsonResource
             'mediaUrl' => $this->mediaUrl,
             'mediaLink' => $this->mediaLink,
             'status' => $this->status,
-            'scope' => ClassifyResource::collection($this->shared()->get()),
+            'relationTypes' => ClassifyResource::collection($this->shared()->get()),
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
             'deletedAt' => $this->deleted_at,

@@ -209,7 +209,6 @@ class ResourceController extends Controller
         $resource->save();
 
         foreach($request->relationTypes as $relation_type){
-            //si ça passe pas les relatiosn types id regarde en faisant $relation_type->id
             $resource->shared()->attach(RelationType::find($relation_type['id']));
         }
 

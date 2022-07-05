@@ -25,7 +25,7 @@ class ResourceSeeder extends Seeder
         ];
 
         foreach (User::all() as $user) {
-            for ($i = 0; $i < 5; $i++) {
+            for ($i = 0; $i <= 15; $i++) {
                 $resource = new Resource();
                 $resource->title = "Lorem ipsum dolor";
                 $resource->views = rand(1, 99);
@@ -39,7 +39,9 @@ class ResourceSeeder extends Seeder
                 $resource->user_id = $user->id;
                 $resource->save();
 
-                $resource->shared()->attach(RelationType::inRandomOrder()->limit(1)->first());
+                if($i == 5 or $i == 10 or $i == 15) {
+                    $resource->shared()->attach(RelationType::inRandomOrder()->limit(1)->first());
+                }
             }
         }
     }
