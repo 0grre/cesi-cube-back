@@ -11,3 +11,15 @@ services:
       MYSQL_USER: laravel
       MYSQL_PASSWORD: laravel
     command: mysqld --default-authentication-plugin=mysql_native_password --sql_mode=""
+
+  fpm:
+    depends_on:
+      - db
+    build:
+      context: ./docker/php-fpm
+    volumes:
+      - ./:/var/www:cached
+    ports:
+      - "8000:8000"
+    command: "php artisan serve --host=0.0.0.0 --port=8000"
+#    command: "php -S 0.0.0.0:8000 -t public"
