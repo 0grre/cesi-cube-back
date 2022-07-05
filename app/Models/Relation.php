@@ -15,6 +15,7 @@ class Relation extends Model
      * @var string[]
      */
     protected $fillable = [
+        'is_accepted',
         'relation_type_id',
         'first_user_id',
         'second_user_id',

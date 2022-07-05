@@ -56,18 +56,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users/{id}', [UserController::class, 'show']);
         Route::put('/users/{id}', [UserController::class, 'update']);
 
-        /* --- User Relation Requests --- */
-        Route::get('/users/{user}/relation_requests', [RelationRequestController::class, 'index']);
-        Route::post('/users/{user}/relation_requests', [RelationRequestController::class, 'store']);
-        Route::get('/users/{user}/relation_requests/{id}', [RelationRequestController::class, 'show']);
-        Route::put('/users/{user}/relation_requests/{relation_request}', [RelationRequestController::class, 'update']);
-        Route::delete('/users/{user}/relation_requests/{id}', [RelationRequestController::class, 'destroy']);
-
         /* --- User Relation --- */
         Route::get('/users/{user}/relations', [RelationController::class, 'index']);
         Route::post('/users/{user}/relations', [RelationController::class, 'store']);
         Route::get('/users/{user}/relations/{id}', [RelationController::class, 'show']);
-        Route::put('/users/{user}/relations/{relation}', [RelationController::class, 'update']);
+        Route::put('/users/{user}/relations/{id}', [RelationController::class, 'update']);
         Route::delete('/users/{user}/relations/{id}', [RelationController::class, 'destroy']);
 
         /* --- Relation Types --- ok */

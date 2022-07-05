@@ -195,6 +195,10 @@ class ResourceController extends Controller
     {
         $resource = $id ? Resource::find($id) : new Resource();
 
+        if (is_null($resource)) {
+            return $this->sendError('Resource not found . ');
+        }
+
         $validator = Validator::make($request->all(), [
             'title' => 'required | string',
             'richTextContent' => 'string',

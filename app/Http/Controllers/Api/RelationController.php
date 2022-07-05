@@ -7,7 +7,6 @@ use App\Http\Resources\RelationResource;
 use App\Models\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -91,35 +90,35 @@ class RelationController extends Controller
      */
     public function RelationValidator(Request $request, $user_id, $id = null): RelationResource|JsonResponse
     {
-        $relation = DB::table('relations')
-            ->whereIn('first_user_id', [$user_id, $request->second_user_id])
-            ->whereIn('second_user_id', [$user_id, $request->second_user_id])
-            ->exists();
-
         $validator = Validator::make($request->all(), [
             'second_user_id' => 'required',
             'relation_type_id' => 'required',
         ]);
 
-        if($validator->fails() or (!$id && $relation)){
-            return $this->sendError('Validation Error.',
-                $relation ? ['Relation with user '. $request->second_user_id .' exist'] : (array)$validator->errors());
-        }
-
-        $relation_request = DB::table('relations')
+        $relation_check = DB::table('relations')
+            ->where('relation_type_id', $request->relation_type_id)
             ->whereIn('first_user_id', [$user_id, $request->second_user_id])
             ->whereIn('second_user_id', [$user_id, $request->second_user_id])
             ->exists();
 
-        if($relation_request and $relation_request->status = 'accepted' and $user_id != $request->second_user_id){
-            $relation = $id ? Relation::find($id) : new Relation();
-            $relation->first_user_id = $user_id;
-            $relation->second_user_id = $request->second_user_id;
-            $relation->relation_type_id = $request->relation_type_id;
-            $relation->save();
-            return RelationResource::make($relation);
-        } else {
-            return $this->sendError("Relation Request doesn't exist or is not valid");
+        if($validator->fails() or (!$id && $relation_check)){
+            return $this->sendError('Validation Error.',
+                $relation_check ? ['Relation with user '. $request->second_user_id .' exist'] : (array)$validator->errors());
         }
+
+        $relation = $id ? Relation::find($id) : new Relation();
+
+        if (is_null($relation)) {
+            return $this->sendError('Relation not found.');
+        }
+
+        $relation->is_accepted = $request->status == 1 ?? 0;
+        $relation->first_user_id = $user_id;
+        $relation->second_user_id = $request->second_user_id;
+        $relation->relation_type_id = $request->relation_type_id;
+        $relation->save();
+
+        return RelationResource::make($relation);
+
     }
 }
