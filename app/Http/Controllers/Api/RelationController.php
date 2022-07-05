@@ -106,7 +106,7 @@ class RelationController extends Controller
 
         if($validator->fails() or (!$id && $relation_check)){
             return $this->sendError('Validation Error.',
-                $relation_check ? ['Relation with user '. $request->secondUser .' exist'] : (array)$validator->errors());
+                $relation_check ? ['Relation with user '. $request->secondUser['firstname']. ' ' . $request->secondUser['lastname'] .' exist'] : (array)$validator->errors());
         }
 
         $relation = $id ? Relation::find($id) : new Relation();
@@ -117,7 +117,7 @@ class RelationController extends Controller
 
         $relation->is_accepted = $request->status == true ?? false;
         $relation->first_user_id = $user_id;
-        $relation->second_user_id = $request->second['id'];
+        $relation->second_user_id = $request->secondUser['id'];
         $relation->relation_type_id = $relationType->id;
         $relation->save();
 
