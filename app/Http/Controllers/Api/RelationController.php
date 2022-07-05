@@ -100,8 +100,8 @@ class RelationController extends Controller
 
         $relation_check = DB::table('relations')
             ->where('relation_type_id', $relationType->id)
-            ->whereIn('first_user_id', [$user_id, $request->secondUser->id])
-            ->whereIn('second_user_id', [$user_id, $request->secondUser->id])
+            ->whereIn('first_user_id', [$user_id, $request->secondUser['id']])
+            ->whereIn('second_user_id', [$user_id, $request->secondUser['id']])
             ->exists();
 
         if($validator->fails() or (!$id && $relation_check)){
@@ -117,7 +117,7 @@ class RelationController extends Controller
 
         $relation->is_accepted = $request->status == true ?? false;
         $relation->first_user_id = $user_id;
-        $relation->second_user_id = $request->secondUser->id;
+        $relation->second_user_id = $request->second['id'];
         $relation->relation_type_id = $relationType->id;
         $relation->save();
 
