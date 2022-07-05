@@ -6,6 +6,7 @@ use App\Filters\ResourceFilter;
 use App\Helpers\CollectionHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ResourceResource;
+use App\Models\RelationType;
 use App\Models\Resource;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -201,12 +202,16 @@ class ResourceController extends Controller
         $resource->title = $request->title ?? $resource->title;
         $resource->richTextContent = $request->richTextContent ?? $resource->richTextContent;
         $resource->mediaLink = $request->mediaLink ?? $resource->mediaLink;
-        $resource->scope = $request->scope ?? $resource->scope;
         $resource->type_id = $request->type['id'] ?? $resource->type_id;
         $resource->category_id = $request->category['id'] ?? $resource->category_id;
         $resource->user_id = $id ? $resource->user_id : Auth::user()->getAuthIdentifier();
 
         $resource->save();
+
+        foreach($request->relationTypes as $relation_type){
+            //si ça passe pas les relatiosn types id regarde en faisant $relation_type->id
+            $resource->shared()->attach(RelationType::find($relation_type['id']));
+        }
 
         return ResourceResource::make($resource);
     }

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\RelationType;
 use App\Models\Resource;
 use App\Models\User;
 use Exception;
@@ -37,6 +38,8 @@ class ResourceSeeder extends Seeder
                 $resource->category_id = rand(1, 13);
                 $resource->user_id = $user->id;
                 $resource->save();
+
+                $resource->shared()->attach(RelationType::inRandomOrder()->limit(1)->first());
             }
         }
     }
