@@ -25,7 +25,7 @@ class RelationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'is_accepted' => $this->status,
+            'is_accepted' => $this->is_accepted,
             'relationType' => $this->relation_type->name,
             'firstUser' => UserResource::make($this->first_user),
             'secondUser' => UserResource::make($this->second_user),
