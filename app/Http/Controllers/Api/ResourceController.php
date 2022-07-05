@@ -10,9 +10,7 @@ use App\Models\Resource;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -20,67 +18,36 @@ use Illuminate\Validation\ValidationException;
 class ResourceController extends Controller
 {
     /**
+     * @param ResourceFilter $resourceFilter
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index(ResourceFilter $resourceFilter): JsonResponse
     {
         if (Auth::user()) {
             if (Auth::user()->hasRole(['citizen', 'moderator'])) {
-                $user_resources = DB::table('resources')
-                    ->whereNull('resources.deleted_at')
-                    ->where(function($query) {
-                        $query->where([
-                            ['resources.status', '=', 'accepted'],
-                            ['resources.scope', '=', 'public']
-                        ])->orWhere('resources.user_id', Auth::user()->getAuthIdentifier());
-                    })
-                    ->join('users', 'resources.user_id', '=', 'users.id')
-                    ->select('resources.*');
 
-                $relations = DB::table('relations')
-                    ->where('first_user_id', '=', Auth::user()->getAuthIdentifier())
-                    ->orWhere('relations.second_user_id', '=', Auth::user()->getAuthIdentifier());
+                $shared_resources = collect(Resource::filter($resourceFilter)->data())->filter(function ($resource) {
+                    return $resource->relation_exist();
+                })->whereNull('deleted_at')
+                    ->where('status', 'accepted')
+                    ->where('user_id', '!=' , Auth::user()->getAuthIdentifier());
 
-                $shared_resources = Resource::joinSub($relations, 'relations', function ($join) {
-                    $join->on('resources.user_id', '=', 'relations.first_user_id')
-                        ->orOn('resources.user_id', '=', 'relations.second_user_id');
-                })
-                    ->join('users', 'resources.user_id', '=', 'users.id')
-                    ->whereNull('resources.deleted_at')
-                    ->where([
-                        ['resources.scope', '=', 'shared'],
-                        ['resources.status', '=', 'accepted']
-                    ])->union($user_resources)
-                    ->select('resources.*')
-                    ->orderBy('created_at', 'desc')
-                    ->get();
+                $user_resources = collect(Resource::filter($resourceFilter)->data())
+                    ->whereNull('deleted_at')
+                    ->where('user_id' , Auth::user()->getAuthIdentifier());
 
-                $resources = $shared_resources;
+                $resources = $shared_resources->merge($user_resources);
 
             } else if (Auth::user()->hasRole(['super-admin', 'admin'])) {
-                $resources = Resource::orderBy('created_at', 'desc')->get();
+                $resources = Resource::filter($resourceFilter)->data();
             }
         } else {
-            $resources = Resource::where([
-                ['resources.status', '=', 'accepted'],
-                ['resources.scope', '=', 'public'],
-                ['resources.deleted_at', null]
-            ])->orderBy('created_at', 'desc')
-                ->get();
+            $resources = collect(Resource::filter($resourceFilter)->data())->filter(function ($resource) {
+                return $resource->is_public();
+            })->where('status', 'accepted')->whereNull('deleted_at');
         }
 
-        return $this->sendResponse(CollectionHelper::paginate(ResourceResource::collection(collect($resources)), 10), 'Resources found successfully.');
-    }
-
-    /**
-     * @param ResourceFilter $resourceFilter
-     * @return LengthAwarePaginator
-     */
-    public function search(ResourceFilter $resourceFilter): LengthAwarePaginator
-    {
-        $resourceFilterResult = Resource::filter($resourceFilter);
-
-        return CollectionHelper::paginate(ResourceResource::collection($resourceFilterResult->data()), 10);
+        return $this->sendResponse(CollectionHelper::paginate(ResourceResource::collection($resources), 10), 'Resources found successfully.');
     }
 
     /**
@@ -203,6 +170,7 @@ class ResourceController extends Controller
             'title' => 'required | string',
             'richTextContent' => 'string',
             'mediaUrl' => 'string',
+            'mediaLink' => 'string',
             'status' => 'string | min:2 | max:55',
             'scope' => 'string | min:2 | max:55',
             'type' => 'required',
@@ -231,8 +199,8 @@ class ResourceController extends Controller
         }
 
         $resource->title = $request->title ?? $resource->title;
-        $resource->views = $request->views ?? $resource->views;
         $resource->richTextContent = $request->richTextContent ?? $resource->richTextContent;
+        $resource->mediaLink = $request->mediaLink ?? $resource->mediaLink;
         $resource->scope = $request->scope ?? $resource->scope;
         $resource->type_id = $request->type['id'] ?? $resource->type_id;
         $resource->category_id = $request->category['id'] ?? $resource->category_id;

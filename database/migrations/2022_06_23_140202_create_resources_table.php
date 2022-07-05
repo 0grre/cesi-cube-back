@@ -19,8 +19,8 @@ return new class extends Migration
             $table->bigInteger('views')->nullable();
             $table->text('richTextContent')->nullable();
             $table->text('mediaUrl')->nullable();
-            $table->string('status')->nullable();
-            $table->string('scope')->nullable();
+            $table->text('mediaLink')->nullable();
+            $table->string('status');
             $table->unsignedBigInteger('type_id')->nullable()->unsigned();
             $table->foreign('type_id')->references('id')->on('types')->onDelete('cascade');
             $table->unsignedBigInteger('category_id')->nullable()->unsigned();

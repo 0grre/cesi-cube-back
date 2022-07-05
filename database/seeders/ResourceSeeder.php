@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Resource;
 use App\Models\User;
+use Exception;
 use Illuminate\Database\Seeder;
 
 class ResourceSeeder extends Seeder
@@ -12,7 +13,7 @@ class ResourceSeeder extends Seeder
      * Run the database seeds.
      *
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function run(): void
     {
@@ -20,12 +21,6 @@ class ResourceSeeder extends Seeder
             'pending',
             'accepted',
             'rejected'
-        ];
-
-        $scopes = [
-            'private',
-            'public',
-            'shared'
         ];
 
         foreach (User::all() as $user) {
@@ -37,8 +32,7 @@ class ResourceSeeder extends Seeder
                 ut labore et dolore magna aliqua. Vitae sapien pellentesque habitant morbi tristique senectus et.
                 Diam maecenas sed enim ut. Accumsan lacus vel facilisis volutpat est. Ut aliquam purus sit amet luctus.
                 Lorem ipsum dolor sit amet consectetur adipiscing elit ut.";
-                $resource->status = $status[rand(0,2)];
-                $resource->scope = $scopes[rand(0,2)];
+                $resource->status = $status[rand(0, 2)];
                 $resource->type_id = rand(1, 4);
                 $resource->category_id = rand(1, 13);
                 $resource->user_id = $user->id;

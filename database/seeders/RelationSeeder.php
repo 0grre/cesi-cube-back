@@ -28,9 +28,9 @@ class RelationSeeder extends Seeder
                     ->whereIn('second_user_id', [$user->id, $second_user->id])
                     ->exists();
 
-                if (!$relation_check) {
+                if (!$relation_check and $user->id != $second_user->id) {
                     $relation = new Relation;
-                    $relation->is_accepted = rand(0, 1);
+                    $relation->is_accepted = (bool)rand(0,1);
                     $relation->first_user_id = $user->id;
                     $relation->second_user_id = $second_user->id;
                     $relation->relation_type_id = $relation_type->id;

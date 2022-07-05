@@ -44,4 +44,13 @@ class Relation extends Model
     {
         return $this->belongsTo(User::class, 'second_user_id');
     }
+
+    /**
+     * @return Collection
+     */
+    public function users_relations(): Collection
+    {
+        $relations = collect($this->belongsTo(User::class, 'second_user_id')->get());
+        return $relations->merge(collect($this->belongsTo(User::class, 'first_user_id')->get()));
+    }
 }

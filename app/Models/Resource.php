@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use JetBrains\PhpStorm\ArrayShape;
 use Laravel\Scout\Attributes\SearchUsingPrefix;
 use Laravel\Scout\Searchable;
@@ -25,8 +27,8 @@ class Resource extends Model
         'views',
         'richTextContent',
         'mediaUrl',
+        'mediaLink',
         'status',
-        'scope',
         'type_id',
         'category_id',
         'user_id',
@@ -86,7 +88,25 @@ class Resource extends Model
      */
     public function shouldBeSearchable(): bool
     {
-        return $this->status == 'accepted' && $this->scope == 'public' && !$this->deleted_at;
+        return $this->status == 'accepted' && $this->is_public() && !$this->deleted_at;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_public(): bool
+    {
+        return empty($this->shared()->first());
+    }
+
+    /**
+     * @return bool
+     */
+    public function relation_exist(): bool
+    {
+        return DB::table('relations')->whereIn('first_user_id', [$this->user_id, Auth::user()->getAuthIdentifier()])
+            ->whereIn('second_user_id', [$this->user_id, Auth::user()->getAuthIdentifier()])
+            ->exists();
     }
 
     /**
@@ -119,6 +139,14 @@ class Resource extends Model
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function shared(): BelongsToMany
+    {
+        return $this->belongsToMany(RelationType::class, 'shared')->withTimestamps();
     }
 
     /**

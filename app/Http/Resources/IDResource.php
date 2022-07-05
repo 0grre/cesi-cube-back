@@ -3,13 +3,17 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use JetBrains\PhpStorm\ArrayShape;
 
-class UserIdResource extends JsonResource
+class IDResource extends JsonResource
 {
     /**
      * @param $request
      * @return array
      */
+    #[ArrayShape([
+        'id' => "mixed"
+    ])]
     public function toArray($request): array
     {
         return [

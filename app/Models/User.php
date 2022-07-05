@@ -145,15 +145,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @return Collection
-     */
-    public function relation_requests(): Collection
-    {
-        $relations = collect($this->hasMany(RelationRequest::class, 'first_user_id')->get());
-        return $relations->merge(collect($this->hasMany(Relation::class, 'second_user_id')->get()));
-    }
-
-    /**
      * @return BelongsToMany
      */
     public function read_later(): BelongsToMany

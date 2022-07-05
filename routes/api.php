@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\ExploitedController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\ReadLaterController;
 use App\Http\Controllers\Api\RelationController;
-use App\Http\Controllers\Api\RelationRequestController;
 use App\Http\Controllers\Api\RelationTypeController;
 use App\Http\Controllers\Api\ResourceController;
 use App\Http\Controllers\Api\TypeController;
@@ -68,7 +67,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/relation_types/{id}', [RelationTypeController::class, 'show']);
 
         /* --- Resources --- ok */
-        Route::get('/search/resources', [ResourceController::class, 'search']);
         Route::post('/resources', [ResourceController::class, 'store']);
         Route::put('/resources/{id}', [ResourceController::class, 'update']);
         Route::delete('/resources/{id}', [ResourceController::class, 'destroy']);

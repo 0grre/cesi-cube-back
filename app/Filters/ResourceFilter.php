@@ -18,6 +18,7 @@ class ResourceFilter extends ModelFilter
             'views',
             'richTextContent',
             'mediaUrl',
+            'mediaLink',
             'status',
             'scope',
             'type_id',
@@ -79,7 +80,8 @@ class ResourceFilter extends ModelFilter
     #[ArrayShape([
         'user' => "string[]",
         'type' => "string[]",
-        'category' => "string[]"
+        'category' => "string[]",
+        'shared' => "string[]",
     ])]
     protected function filterableRelations(): array
     {
@@ -95,6 +97,9 @@ class ResourceFilter extends ModelFilter
             'category' => [
                 'category_name' => 'name',
             ],
+            'shared' => [
+                'relation_type_name' => 'name',
+            ],
         ];
     }
 
@@ -106,7 +111,8 @@ class ResourceFilter extends ModelFilter
         return [
             'user',
             'type',
-            'category'
+            'category',
+            'shared',
         ];
     }
 }
