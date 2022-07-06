@@ -171,7 +171,6 @@ class ResourceController extends Controller
             'title' => 'required | string',
             'richTextContent' => 'string',
             'mediaUrl' => 'string',
-            'mediaLink' => 'string',
             'status' => 'string | min:2 | max:55',
             'scope' => 'string | min:2 | max:55',
             'type' => 'required',
