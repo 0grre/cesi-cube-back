@@ -25,7 +25,7 @@ class ResourceController extends Controller
     public function index(ResourceFilter $resourceFilter): JsonResponse
     {
         if (Auth::user()) {
-            if (Auth::user()->hasRole(['citizen', 'moderator'])) {
+            if (Auth::user()->hasRole(['citizen'])) {
 
                 $shared_resources = collect(Resource::filter($resourceFilter)->data())->filter(function ($resource) {
                     return $resource->relation_exist();
@@ -39,7 +39,7 @@ class ResourceController extends Controller
 
                 $resources = $shared_resources->merge($user_resources);
 
-            } else if (Auth::user()->hasRole(['super-admin', 'admin'])) {
+            } else if (Auth::user()->hasRole(['moderator', 'super-admin', 'admin'])) {
                 $resources = Resource::filter($resourceFilter)->data();
             }
         } else {
@@ -143,7 +143,7 @@ class ResourceController extends Controller
      */
     public function check_owner($resource): bool
     {
-        if (Auth::user()->hasRole(['citizen', 'moderator'])) {
+        if (Auth::user()->hasRole(['citizen'])) {
             if ($resource->user_id != Auth::user()->getAuthIdentifier()) {
                 return false;
             } else {
@@ -170,7 +170,6 @@ class ResourceController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required | string',
             'richTextContent' => 'string',
-            'mediaUrl' => 'string',
             'status' => 'string | min:2 | max:55',
             'scope' => 'string | min:2 | max:55',
             'type' => 'required',
@@ -207,8 +206,10 @@ class ResourceController extends Controller
 
         $resource->save();
 
-        foreach($request->relationTypes as $relation_type){
-            $resource->shared()->attach(RelationType::find($relation_type['id']));
+        if (!empty($request->relationTypes)) {
+            foreach ($request->relationTypes as $relation_type) {
+                $resource->shared()->attach(RelationType::find($relation_type['id']));
+            }
         }
 
         return ResourceResource::make($resource);

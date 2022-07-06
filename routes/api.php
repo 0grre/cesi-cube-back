@@ -41,6 +41,8 @@ Route::middleware('guest')->group(function () {
     /* --- Public Resources --- */
     Route::get('/public/resources', [ResourceController::class, 'index']);
     Route::get('/public/resources/{id}', [ResourceController::class, 'show']);
+
+    Route::get('/relation_types', [RelationTypeController::class, 'index']);
 });
 
 /* --- Connected citizen --- */
@@ -65,7 +67,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/users/{user}/relations/{id}', [RelationController::class, 'destroy']);
 
         /* --- Relation Types --- ok */
-        Route::get('/relation_types', [RelationTypeController::class, 'index']);
         Route::get('/relation_types/{id}', [RelationTypeController::class, 'show']);
 
         /* --- Resources --- ok */
