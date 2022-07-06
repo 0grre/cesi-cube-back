@@ -116,7 +116,7 @@ class RelationController extends Controller
         }
 
         $relation->is_accepted = $request->isAccepted == true ?? false;
-        $relation->first_user_id = $user_id;
+        $relation->first_user_id = $request->firstUser['id'];
         $relation->second_user_id = $request->secondUser['id'];
         $relation->relation_type_id = $relationType->id;
         $relation->save();
