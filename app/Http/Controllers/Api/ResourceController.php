@@ -37,7 +37,13 @@ class ResourceController extends Controller
                     ->whereNull('deleted_at')
                     ->where('user_id' , Auth::user()->getAuthIdentifier());
 
-                $resources = $shared_resources->merge($user_resources);
+                $public_resources = collect(Resource::filter($resourceFilter)->data())->filter(function ($resource) {
+                    return $resource->is_public();
+                })->where('status', 'accepted')->whereNull('deleted_at');
+
+                $test_resources = $shared_resources->merge($user_resources);
+                $resources = $test_resources->merge($public_resources);
+                $resources = $resources->unique();
 
             } else if (Auth::user()->hasRole(['moderator', 'super-admin', 'admin'])) {
                 $resources = Resource::filter($resourceFilter)->data();
